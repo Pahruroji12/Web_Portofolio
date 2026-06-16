@@ -396,7 +396,7 @@
 
 
 /* ============================================
-   6. MODALS
+   6. MODALS + GALLERY
    ============================================ */
 (function initModals() {
   const openBtns  = document.querySelectorAll('.open-modal');
@@ -408,6 +408,12 @@
     if (el) {
       el.classList.add('active');
       document.body.style.overflow = 'hidden';
+
+      // Load iframe if present (lazy loading preview)
+      const iframe = el.querySelector('iframe[data-src]');
+      if (iframe) {
+        iframe.src = iframe.dataset.src;
+      }
     }
   }
 
@@ -416,6 +422,19 @@
     if (el) {
       el.classList.remove('active');
       document.body.style.overflow = '';
+
+      // Unload iframe if present (to release resources)
+      const iframe = el.querySelector('iframe[data-src]');
+      if (iframe) {
+        iframe.src = '';
+      }
+
+      // Pause and reset video if present
+      const video = el.querySelector('video');
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
     }
   }
 
@@ -434,8 +453,7 @@
   overlays.forEach(overlay => {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) {
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
+        closeModal(overlay.id);
       }
     });
   });
@@ -443,8 +461,116 @@
   // Close on Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      overlays.forEach(o => o.classList.remove('active'));
-      document.body.style.overflow = '';
+      overlays.forEach(o => {
+        if (o.classList.contains('active')) {
+          closeModal(o.id);
+        }
+      });
+    }
+  });
+
+  /* ── Gallery Setup ── */
+  const gallerySets = document.querySelectorAll('.gallery-thumbnails');
+
+  gallerySets.forEach(container => {
+    const id       = container.id;                              // e.g. "gallery-thumbs-1"
+    const suffix   = id ? id.replace('gallery-thumbs-', '') : '';
+    const heroImg  = document.getElementById('gallery-hero-' + suffix);
+    const caption  = document.getElementById('gallery-caption-' + suffix);
+    const counter  = document.getElementById('gallery-counter-' + suffix);
+    const prevBtn  = document.getElementById('gallery-prev-' + suffix);
+    const nextBtn  = document.getElementById('gallery-next-' + suffix);
+    const thumbs   = container.querySelectorAll('.gallery-thumb');
+
+    if (!heroImg || thumbs.length === 0) return;
+
+    let currentIdx = 0;
+    const total    = thumbs.length;
+
+    // ── Shared navigation function ──
+    function navigateToIndex(idx, animate) {
+      if (idx < 0) idx = total - 1;
+      if (idx >= total) idx = 0;
+      if (idx === currentIdx && animate) return;
+
+      currentIdx = idx;
+      const thumb = thumbs[idx];
+      const src   = thumb.dataset.src;
+      const alt   = thumb.dataset.alt || '';
+      const cap   = thumb.dataset.caption || '';
+
+      // Update active thumbnail
+      thumbs.forEach(t => t.classList.remove('active'));
+      thumb.classList.add('active');
+
+      // Auto-scroll thumbnail into view
+      thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+      // Update counter
+      if (counter) counter.textContent = (idx + 1) + ' / ' + total;
+
+      if (animate) {
+        // Smooth fade transition
+        heroImg.classList.add('fade-out');
+        setTimeout(() => {
+          heroImg.src = src;
+          heroImg.alt = alt;
+          if (caption) caption.textContent = cap;
+          heroImg.classList.remove('fade-out');
+        }, 280);
+      } else {
+        heroImg.src = src;
+        heroImg.alt = alt;
+        if (caption) caption.textContent = cap;
+      }
+    }
+
+    // ── Thumbnail clicks ──
+    container.addEventListener('click', (e) => {
+      const thumb = e.target.closest('.gallery-thumb');
+      if (!thumb) return;
+      const idx = Array.from(thumbs).indexOf(thumb);
+      if (idx !== -1) navigateToIndex(idx, true);
+    });
+
+    // ── Prev / Next buttons ──
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        navigateToIndex(currentIdx - 1, true);
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        navigateToIndex(currentIdx + 1, true);
+      });
+    }
+
+    // ── Keyboard arrows (when modal is active) ──
+    document.addEventListener('keydown', (e) => {
+      // Only react if the modal containing this gallery is active
+      const modal = container.closest('.modal-overlay');
+      if (!modal || !modal.classList.contains('active')) return;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigateToIndex(currentIdx - 1, true);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateToIndex(currentIdx + 1, true);
+      }
+    });
+
+    // ── Reset gallery on modal close ──
+    const modal = container.closest('.modal-overlay');
+    if (modal) {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          if (mutation.attributeName === 'class' && !modal.classList.contains('active')) {
+            navigateToIndex(0, false);
+          }
+        });
+      });
+      observer.observe(modal, { attributes: true });
     }
   });
 })();
