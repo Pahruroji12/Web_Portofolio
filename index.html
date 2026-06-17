@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pahruroji — IT Support & Developer</title>
 
+  <!-- Immediate Theme Setter Script -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initial = saved || (systemPrefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', initial);
+    })();
+  </script>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,9 +23,40 @@
   <!-- Boxicons CDN -->
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
 
+  <!-- Devicon CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+
+  <!-- ============ PRELOADER ============ -->
+  <div id="preloader">
+    <div class="preloader-content">
+      <div class="preloader-text-loader">
+        <span style="--delay: 0.15s">P</span>
+        <span style="--delay: 0.3s">l</span>
+        <span style="--delay: 0.45s">e</span>
+        <span style="--delay: 0.6s">a</span>
+        <span style="--delay: 0.75s">s</span>
+        <span style="--delay: 0.9s">e</span>
+        <span class="preloader-space">&nbsp;</span>
+        <span style="--delay: 1.05s">w</span>
+        <span style="--delay: 1.2s">a</span>
+        <span style="--delay: 1.35s">i</span>
+        <span style="--delay: 1.5s">t</span>
+        <span style="--delay: 1.65s">.</span>
+        <span style="--delay: 1.8s">.</span>
+      </div>
+      <div class="preloader-spinner-wrapper">
+        <svg class="preloader-svg" viewBox="0 0 100 100">
+          <circle class="preloader-track" cx="50" cy="50" r="45"></circle>
+          <circle class="preloader-circle" cx="50" cy="50" r="45" id="preloader-circle-bar"></circle>
+        </svg>
+        <div class="preloader-percent" id="preloader-percent">0%</div>
+      </div>
+    </div>
+  </div>
 
   <!-- Background Canvas -->
   <canvas id="bg-canvas"></canvas>
@@ -81,16 +122,74 @@
     <div class="section-container">
       <h2 class="section-title reveal">Tentang Saya</h2>
       <div class="about-content">
-        <div class="about-card reveal-up" style="--reveal-delay: 0.15s">
-          <div class="about-icon"><i class='bx bx-user-circle'></i></div>
-          <p class="about-text">
-            Saya memiliki pengalaman di bidang IT Support, khususnya dalam jaringan komputer, troubleshooting perangkat, instalasi perangkat lunak, serta kebutuhan teknis operasional. Selain itu, saya juga merupakan mahasiswa Sistem Informasi yang sedang mengembangkan kemampuan di bidang Web Development dan Mobile Development.
+        <div class="about-wrapper">
+          <!-- Card Utama -->
+          <div class="about-card reveal-up" style="--reveal-delay: 0.1s">
+            <div class="about-card-header">
+              <div class="about-icon"><i class='bx bx-user-circle'></i></div>
+              <span class="about-subtitle">Profil Singkat</span>
+            </div>
+            <div class="about-desc">
+              <p>
+                Saya memiliki pengalaman di bidang IT Support, khususnya dalam jaringan komputer, troubleshooting perangkat, instalasi perangkat lunak, serta kebutuhan teknis operasional.
+              </p>
+              <p>
+                Selain itu, saya juga merupakan mahasiswa Sistem Informasi yang sedang mengembangkan kemampuan di bidang Web Development dan Mobile Development. Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus belajar, mencoba hal baru, dan membangun project sederhana sebagai bagian dari proses pengembangan diri.
+              </p>
+            </div>
+            <div class="about-tags">
+              <span class="tag"><i class='bx bx-network-chart'></i> IT Support</span>
+              <span class="tag"><i class='bx bxs-graduation'></i> Mahasiswa Sistem Informasi</span>
+              <span class="tag"><i class='bx bx-code-alt'></i> Web Development</span>
+              <span class="tag"><i class='bx bx-mobile-alt'></i> Mobile Development</span>
+            </div>
+          </div>
 
-Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus belajar, mencoba hal baru, dan membangun project sederhana sebagai bagian dari proses pengembangan diri.
-          <div class="about-tags">
-            <span class="tag"><i class='bx bx-network-chart'></i> IT Support</span>
-            <span class="tag"><i class='bx bx-code-alt'></i> Web Development</span>
-            <span class="tag"><i class='bx bx-mobile-alt'></i> Mobile Development</span>
+          <!-- Grid Mini Highlight Cards -->
+          <div class="about-highlights-grid">
+            <!-- Highlight 1: IT Support -->
+            <div class="about-highlight-card reveal-up" style="--reveal-delay: 0.2s">
+              <div class="highlight-header">
+                <i class='bx bx-desktop highlight-icon' style="color: #ef4444;"></i>
+                <h4>IT Support</h4>
+              </div>
+              <p class="highlight-text">
+                Jaringan komputer, troubleshooting perangkat, instalasi software, dan kebutuhan teknis operasional.
+              </p>
+            </div>
+
+            <!-- Highlight 2: Sistem Informasi -->
+            <div class="about-highlight-card reveal-up" style="--reveal-delay: 0.3s">
+              <div class="highlight-header">
+                <i class='bx bxs-graduation highlight-icon' style="color: #f59e0b;"></i>
+                <h4>Sistem Informasi</h4>
+              </div>
+              <p class="highlight-text">
+                Mahasiswa Sistem Informasi yang terus belajar dan mengembangkan kemampuan di bidang teknologi.
+              </p>
+            </div>
+
+            <!-- Highlight 3: Web Development -->
+            <div class="about-highlight-card reveal-up" style="--reveal-delay: 0.4s">
+              <div class="highlight-header">
+                <i class='bx bx-code-alt highlight-icon' style="color: #3b82f6;"></i>
+                <h4>Web Development</h4>
+              </div>
+              <p class="highlight-text">
+                Sedang belajar membangun website yang responsive, modern, dan mudah digunakan.
+              </p>
+            </div>
+
+            <!-- Highlight 4: Mobile Development -->
+            <div class="about-highlight-card reveal-up" style="--reveal-delay: 0.5s">
+              <div class="highlight-header">
+                <i class='bx bx-mobile-alt highlight-icon' style="color: #10b981;"></i>
+                <h4>Mobile Development</h4>
+              </div>
+              <p class="highlight-text">
+                Sedang mengembangkan pemahaman dasar dalam pembuatan aplikasi mobile.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -109,17 +208,17 @@ Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus be
             <i class='bx bx-network-chart skill-cat-icon'></i>
             <h3>Network</h3>
           </div>
-          <ul class="skill-list">
-            <li><i class='bx bx-check'></i> Konfigurasi MikroTik</li>
-            <li><i class='bx bx-check'></i> TCP/IP</li>
-            <li><i class='bx bx-check'></i> DNS</li>
-            <li><i class='bx bx-check'></i> DHCP</li>
-            <li><i class='bx bx-check'></i> LAN / WAN</li>
-            <li><i class='bx bx-check'></i> WiFi</li>
-            <li><i class='bx bx-check'></i> Subnetting</li>
-            <li><i class='bx bx-check'></i> Troubleshooting Komputer</li>
-            <li><i class='bx bx-check'></i> Instalasi Software</li>
-          </ul>
+          <div class="skill-pills">
+            <span class="skill-pill"><i class='bx bx-server' style="color: #0054A6;"></i> Konfigurasi MikroTik</span>
+            <span class="skill-pill"><i class='bx bx-transfer-alt' style="color: #00a8cc;"></i> TCP/IP</span>
+            <span class="skill-pill"><i class='bx bx-globe' style="color: #3b82f6;"></i> DNS</span>
+            <span class="skill-pill"><i class='bx bx-shuffle' style="color: #f59e0b;"></i> DHCP</span>
+            <span class="skill-pill"><i class='bx bx-sitemap' style="color: #8b5cf6;"></i> LAN / WAN</span>
+            <span class="skill-pill"><i class='bx bx-wifi' style="color: #10b981;"></i> WiFi</span>
+            <span class="skill-pill"><i class='bx bx-calculator' style="color: #ec4899;"></i> Subnetting</span>
+            <span class="skill-pill"><i class='bx bx-wrench' style="color: #ef4444;"></i> Troubleshooting Komputer</span>
+            <span class="skill-pill"><i class='bx bx-download' style="color: #6366f1;"></i> Instalasi Software</span>
+          </div>
         </div>
 
         <!-- Programming -->
@@ -128,14 +227,14 @@ Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus be
             <i class='bx bx-code-block skill-cat-icon'></i>
             <h3>Programming</h3>
           </div>
-          <ul class="skill-list">
-            <li><i class='bx bx-check'></i> HTML</li>
-            <li><i class='bx bx-check'></i> CSS</li>
-            <li><i class='bx bx-check'></i> JavaScript</li>
-            <li><i class='bx bx-check'></i> Flutter Dasar</li>
-            <li><i class='bx bx-check'></i> Dart Dasar</li>
-            <li><i class='bx bx-check'></i> Git & GitHub</li>
-          </ul>
+          <div class="skill-pills">
+            <span class="skill-pill"><i class="devicon-html5-plain colored"></i> HTML</span>
+            <span class="skill-pill"><i class="devicon-css3-plain colored"></i> CSS</span>
+            <span class="skill-pill"><i class="devicon-javascript-plain colored"></i> JavaScript</span>
+            <span class="skill-pill"><i class="devicon-flutter-plain colored"></i> Flutter Dasar</span>
+            <span class="skill-pill"><i class="devicon-dart-plain colored"></i> Dart Dasar</span>
+            <span class="skill-pill"><i class="devicon-git-plain colored"></i> Git & GitHub</span>
+          </div>
         </div>
 
         <!-- Tools -->
@@ -144,12 +243,20 @@ Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus be
             <i class='bx bx-wrench skill-cat-icon'></i>
             <h3>Tools</h3>
           </div>
-          <ul class="skill-list">
-            <li><i class='bx bx-check'></i> VS Code</li>
-            <li><i class='bx bx-check'></i> GitHub</li>
-            <li><i class='bx bx-check'></i> MikroTik Winbox</li>
-            <li><i class='bx bx-check'></i> Microsoft Office</li>
-          </ul>
+          <div class="skill-pills">
+            <span class="skill-pill"><i class="devicon-vscode-plain colored"></i> VS Code</span>
+            <span class="skill-pill"><i class="devicon-github-original" style="color: var(--text-main);"></i> GitHub</span>
+            <span class="skill-pill">
+              <svg class="skill-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 1.5L2 6.5L12 11.5L22 6.5L12 1.5Z" fill="#00E5FF"/>
+                <path d="M2 16.5L12 21.5L22 16.5V7.5L12 12.5L2 7.5V16.5Z" fill="#00B0FF"/>
+                <path d="M12 12.5L22 7.5V16.5L12 21.5V12.5Z" fill="#0081CB"/>
+                <rect x="7.5" y="11" width="2.5" height="2.5" fill="#ffffff" opacity="0.8"/>
+                <rect x="14" y="11" width="2.5" height="2.5" fill="#ffffff" opacity="0.8"/>
+              </svg> MikroTik Winbox
+            </span>
+            <span class="skill-pill"><i class='bx bx-spreadsheet' style="color: #217346;"></i> Microsoft Office</span>
+          </div>
         </div>
 
       </div>
@@ -180,8 +287,26 @@ Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus be
           </div>
         </div>
 
-        <!-- Project 2: EDP NetOps -->
-        <div class="project-card reveal-up" data-modal="modal-1" style="--reveal-delay: 0.2s">
+        <!-- Project 2: Kedai Kopi Remaja Jompo -->
+        <div class="project-card reveal-up" data-modal="modal-4" style="--reveal-delay: 0.2s">
+          <div class="project-thumb">
+            <img src="assets/kopi_preview.png" alt="Kedai Kopi Remaja Jompo Preview" class="project-thumb-img" loading="lazy" style="object-position: top;" />
+            <div class="project-overlay">
+              <button class="btn btn-primary btn-sm open-modal" data-modal="modal-4">Lihat Detail</button>
+            </div>
+          </div>
+          <div class="project-info">
+            <span class="project-type">Frontend Web / Landing Page</span>
+            <h3 class="project-name">Kedai Kopi Remaja Jompo</h3>
+            <p class="project-desc">Website landing page untuk kedai kopi yang menampilkan informasi brand, menu kopi, produk unggulan, kontak, serta detail produk.</p>
+            <div class="project-tech">
+              <span>HTML</span><span>CSS</span><span>JavaScript</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 3: EDP NetOps -->
+        <div class="project-card reveal-up" data-modal="modal-1" style="--reveal-delay: 0.3s">
           <div class="project-thumb">
             <img src="assets/EDP NetOps/1_Dashboard.jpeg" alt="EDP NetOps Dashboard" class="project-thumb-img" loading="lazy" style="object-position: top;" />
             <div class="project-overlay">
@@ -198,8 +323,8 @@ Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus be
           </div>
         </div>
 
-        <!-- Project 3: Bot Tambah MAC -->
-        <div class="project-card reveal-up" data-modal="modal-2" style="--reveal-delay: 0.3s">
+        <!-- Project 4: Bot Tambah MAC -->
+        <div class="project-card reveal-up" data-modal="modal-2" style="--reveal-delay: 0.4s">
           <div class="project-thumb">
             <img src="assets/Bot Tele/BotTambahMac.png" alt="Bot Tambah MAC" class="project-thumb-img" loading="lazy" style="object-position: top;" />
             <div class="project-overlay">
@@ -287,6 +412,13 @@ Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus be
   <!-- ============ FOOTER ============ -->
   <footer class="footer reveal">
     <div class="footer-inner">
+      <!-- Footer Logo/Identitas -->
+      <div class="footer-brand">
+        <a href="#home" class="footer-logo">Pahruroji<span class="dot">.</span></a>
+        <p class="footer-subtitle">IT Support &amp; Mahasiswa Sistem Informasi</p>
+      </div>
+
+      <!-- Footer Navigasi -->
       <nav class="footer-nav">
         <a href="#home" class="footer-link">Home</a>
         <a href="#about" class="footer-link">About</a>
@@ -294,6 +426,8 @@ Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus be
         <a href="#projects" class="footer-link">Projects</a>
         <a href="#contact" class="footer-link">Contact</a>
       </nav>
+
+      <!-- Footer Sosial Media -->
       <div class="footer-socials">
         <a href="mailto:pahruroji@email.com" class="footer-social" aria-label="Email"><i class='bx bx-envelope'></i></a>
         <a href="#" class="footer-social" aria-label="WhatsApp" target="_blank" rel="noopener"><i class='bx bxl-whatsapp'></i></a>
@@ -301,7 +435,9 @@ Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus be
         <a href="#" class="footer-social" aria-label="GitHub" target="_blank" rel="noopener"><i class='bx bxl-github'></i></a>
         <a href="#" class="footer-social" aria-label="Instagram" target="_blank" rel="noopener"><i class='bx bxl-instagram'></i></a>
       </div>
-      <p class="footer-copy">© 2026 Pahruroji. All Rights Reserved.</p>
+
+      <!-- Copyright -->
+      <p class="footer-copy">&copy; 2026 Pahruroji. All Rights Reserved.</p>
     </div>
   </footer>
 
@@ -586,6 +722,89 @@ Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus be
           </div>
 
 
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Kedai Kopi Remaja Jompo — Live Preview ============ -->
+  <div class="modal-overlay" id="modal-4">
+    <div class="modal modal--preview">
+      <button class="modal-close" data-modal="modal-4"><i class='bx bx-x'></i></button>
+
+      <!-- Live Preview (iframe, top) -->
+      <div class="preview-demo-wrapper">
+        <div class="modal-section">
+          <h4><i class='bx bx-window-alt'></i> Live Preview</h4>
+        </div>
+        <div class="preview-wrap">
+          <iframe
+            class="preview-iframe"
+            data-src="https://remaja-jompo.vercel.app"
+            title="Kedai Kopi Remaja Jompo Preview"
+            loading="lazy"
+            sandbox="allow-scripts allow-same-origin"
+          ></iframe>
+        </div>
+        <div class="preview-actions">
+          <a href="https://remaja-jompo.vercel.app" class="btn btn-primary btn-sm" target="_blank" rel="noopener">
+            <i class='bx bx-link-external'></i> Lihat Demo
+          </a>
+        </div>
+      </div>
+
+      <!-- Project Info (below preview) -->
+      <div class="modal-preview-detail">
+        <div class="modal-header">
+          <i class='bx bxs-coffee modal-icon'></i>
+          <div>
+            <span class="project-type">Frontend Web / Landing Page</span>
+            <h3>Kedai Kopi Remaja Jompo</h3>
+          </div>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">Kedai Kopi Remaja Jompo adalah project website landing page untuk kedai kopi yang menampilkan informasi brand, menu kopi, produk unggulan, kontak, serta detail produk. Project ini dibuat sebagai latihan membangun tampilan website yang menarik, responsive, dan memiliki beberapa interaksi sederhana menggunakan JavaScript.</p>
+
+          <div class="modal-section">
+            <h4><i class='bx bx-target-lock'></i> Tujuan Project</h4>
+            <p>Project ini dibuat untuk melatih pembuatan website landing page dengan struktur lengkap, mulai dari navbar, hero section, about, menu, produk, kontak, sampai footer. Selain itu, project ini juga digunakan untuk melatih interaksi JavaScript seperti hamburger menu, search form, shopping cart, dan modal detail produk.</p>
+          </div>
+
+          <div class="modal-section">
+            <h4><i class='bx bx-list-check'></i> Fitur Utama</h4>
+            <ul>
+              <li>Navbar dengan menu navigasi</li>
+              <li>Hero section dengan background image</li>
+              <li>Section Tentang Kami</li>
+              <li>Section Menu Kopi</li>
+              <li>Section Produk Unggulan</li>
+              <li>Search form interaktif</li>
+              <li>Shopping cart sidebar</li>
+              <li>Modal detail produk</li>
+              <li>Google Maps embed pada section kontak</li>
+              <li>Form kontak sederhana</li>
+              <li>Footer dengan social media link</li>
+              <li>Responsive design untuk desktop, tablet, dan mobile</li>
+            </ul>
+          </div>
+
+          <div class="modal-section">
+            <h4><i class='bx bx-code-alt'></i> Teknologi</h4>
+            <div class="project-tech">
+              <span><i class='bx bxl-html5'></i> HTML</span>
+              <span><i class='bx bxl-css3'></i> CSS</span>
+              <span><i class='bx bxl-javascript'></i> JavaScript</span>
+              <span><i class='bx bx-font'></i> Google Fonts</span>
+              <span><i class='bx bx-map-alt'></i> Google Maps Embed</span>
+              <span><i class='bx bx-cloud-upload'></i> Vercel</span>
+            </div>
+          </div>
+
+          <div class="modal-section">
+            <h4><i class='bx bx-check-circle'></i> Status</h4>
+            <span class="status-badge published"><i class='bx bx-check-double'></i> Selesai &mdash; Published</span>
+          </div>
         </div>
       </div>
 

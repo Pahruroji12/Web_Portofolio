@@ -11,73 +11,113 @@
 
 /* ============================================
    1. INTERACTIVE DOT MATRIX GRID (CANVAS)
-      + Twinkle / Starfield Effect
+      + 3D Starfield Effect with Depth Tiers
    ============================================ */
 (function initCanvas() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
-  const GRID_SPACE = 16;       // distance between dots (smaller = denser)
-  const DOT_BASE   = 0.5;      // base dot radius (tiny dots)
-  const DOT_MAX    = 1.4;      // max radius when near cursor
-  const RADIUS     = 200;      // cursor influence radius
-  const LERP_SPEED = 0.12;     // smoothing factor (lower = smoother)
+
+  // Detect mobile and preferences
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Grid spacing: larger spacing means fewer dots and much better performance
+  const GRID_SPACE = isMobile ? 26 : 20; 
+  const RADIUS     = isMobile ? 120 : 180; // Cursor influence radius
+  const LERP_SPEED = 0.12;
 
   // Idle fade settings
-  const IDLE_TIMEOUT   = 1500;  // ms before dots start fading
-  const OPACITY_ACTIVE = 1.0;   // full opacity when cursor moves
-  const OPACITY_IDLE   = 0.25;  // dimmed opacity when idle
-  const FADE_SPEED     = 0.03;  // how fast opacity transitions
+  const IDLE_TIMEOUT   = 1800;
+  const OPACITY_ACTIVE = 1.0;
+  const OPACITY_IDLE   = 0.35; // Raised slightly so dots stay visible when idle
+  const FADE_SPEED     = 0.02; // Smoother transition
 
-  // ── Twinkle settings ──
-  const TWINKLE_CHANCE   = 0.06;   // ~6% of dots will twinkle
-  const TWINKLE_MIN_OPACITY = 0.12; // minimum twinkle brightness
-  const TWINKLE_MAX_OPACITY = 0.40; // maximum twinkle brightness
-  const TWINKLE_SPEED_MIN  = 0.0008; // slowest cycle (~8s full cycle)
-  const TWINKLE_SPEED_MAX  = 0.0020; // fastest cycle (~3s full cycle)
-  const TWINKLE_RADIUS_BOOST = 0.3;  // slight size boost when twinkling
+  // Depth tiers for twinkling stars
+  const TIERS = [
+    { name: 'far',  chance: 0.03, dotBase: 0.4, dotMax: 0.8, twinkleMax: 0.3,  driftAmp: 0.4, driftSpeed: 0.0002, glowSize: 0, flareChance: 0 },
+    { name: 'mid',  chance: 0.02, dotBase: 0.6, dotMax: 1.2, twinkleMax: 0.5,  driftAmp: 0.8, driftSpeed: 0.0004, glowSize: 3, flareChance: 0 },
+    { name: 'near', chance: 0.01, dotBase: 0.8, dotMax: 1.6, twinkleMax: 0.65, driftAmp: 1.4, driftSpeed: 0.0006, glowSize: 5, flareChance: 0.1 },
+  ];
+  const TOTAL_TWINKLE_CHANCE = TIERS.reduce((s, t) => s + t.chance, 0);
 
-  // Detect mobile for lighter animation
-  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-  const mobileScale = isMobile ? 0.5 : 1;
+  const PLAIN_DOT_BASE = 0.5;
+  const PLAIN_DOT_MAX  = 1.2;
+
+  // Twinkle wave speeds (dual sine)
+  const WAVE_SPEED_A_MIN = 0.0008;
+  const WAVE_SPEED_A_MAX = 0.0020;
+  const WAVE_SPEED_B_MIN = 0.0004;
+  const WAVE_SPEED_B_MAX = 0.0010;
+
+  // Cursor ambient glow settings
+  const CURSOR_GLOW_RADIUS = isMobile ? 100 : 180;
+  const CURSOR_GLOW_ALPHA  = 0.08;
 
   let mouse = { x: -9999, y: -9999 };
+  let smoothMouse = { x: -9999, y: -9999 };
   let dots  = [];
   let animId;
   let theme = document.documentElement.getAttribute('data-theme') || 'light';
 
-  // Idle tracking
+  // State variables for smooth canvas color transitions
+  let targetColors = getColors();
+  let currentStaticColor = hexToRgb(targetColors.static);
+  let currentCursorColor = hexToRgb(targetColors.cursor);
+  let currentTwinkleColors = {
+    far: getTwinkleColor('far'),
+    mid: getTwinkleColor('mid'),
+    near: getTwinkleColor('near')
+  };
+
   let idleTimer    = null;
-  let isIdle       = true;       // start dimmed
+  let isIdle       = true;
   let globalOpacity = OPACITY_IDLE;
 
-  // Seeded pseudo-random for consistent dot selection
+  // Spark settings and arrays (expanding horizontal/vertical line pulses)
+  const SPARK_INTERVAL = [120, 300];  // Jeda antar kemunculan spark baru (ms)
+  const SPARK_DURATION = [500, 1000]; // Durasi satu spark (ms)
+  const SPARK_LEN      = [20, 50];     // Panjang garis spark (px)
+  let sparks = [];
+  let nextSparkAt = 0;
+
+  // Seeded pseudo-random generator
   function seededRandom(seed) {
     let x = Math.sin(seed) * 43758.5453;
     return x - Math.floor(x);
   }
 
+  // Define static dot color and cursor highlight color
   function getColors() {
     if (theme === 'dark') {
-      return { static: '#1F2226', cursor: '#FFFFFF' };
+      return { static: '#1F2226', cursor: '#3B82F6' }; // Accent blue in dark mode
     }
-    return { static: '#E5E7EB', cursor: '#000000' };
+    return { static: '#E5E7EB', cursor: '#2563EB' }; // Accent blue in light mode
   }
 
-  // Twinkle glow color (soft warm-white / cool-blue tint)
-  function getTwinkleColor() {
+  // Twinkle star colors (following blue accent theme)
+  function getTwinkleColor(tierName) {
     if (theme === 'dark') {
-      return { r: 180, g: 200, b: 255 }; // subtle cool-blue starlight
+      switch (tierName) {
+        case 'far':  return { r: 120, g: 150, b: 220 }; // Soft ice blue
+        case 'mid':  return { r: 150, g: 180, b: 255 }; // Bright blue-white
+        case 'near': return { r: 210, g: 225, b: 255 }; // Pure star white-blue
+      }
     }
-    return { r: 100, g: 120, b: 180 }; // muted blue for light mode
+    switch (tierName) {
+      case 'far':  return { r: 180, g: 200, b: 240 };
+      case 'mid':  return { r: 140, g: 170, b: 230 };
+      case 'near': return { r: 37, g: 99, b: 235 };
+    }
   }
 
   function hexToRgb(hex) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return { r, g, b };
+    return {
+      r: parseInt(hex.slice(1, 3), 16),
+      g: parseInt(hex.slice(3, 5), 16),
+      b: parseInt(hex.slice(5, 7), 16),
+    };
   }
 
   function lerp(a, b, t) {
@@ -91,31 +131,76 @@
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const idx = r * cols + c;
-        const seed = idx * 7 + r * 13 + c * 31; // deterministic seed
+        const idx  = r * cols + c;
+        const seed = idx * 7 + r * 13 + c * 31;
+        const rng  = seededRandom(seed);
 
-        // Semi-random selection with spacing: use seeded random
-        // to ensure even distribution across the grid
-        const rng = seededRandom(seed);
-        const isTwinkle = rng < TWINKLE_CHANCE;
+        // Assign a depth tier for movement/parallax for all dots
+        const depthRng = seededRandom(seed + 400);
+        let depth = 0.3;      // Far
+        let driftAmp = 0.5;
+        let driftSpeed = 0.00025;
+
+        if (depthRng > 0.85) {
+          depth = 1.0;        // Near
+          driftAmp = 1.6;
+          driftSpeed = 0.0006;
+        } else if (depthRng > 0.55) {
+          depth = 0.6;        // Mid
+          driftAmp = 1.0;
+          driftSpeed = 0.0004;
+        }
 
         const dot = {
+          baseX:   c * GRID_SPACE,
+          baseY:   r * GRID_SPACE,
           x:       c * GRID_SPACE,
           y:       r * GRID_SPACE,
-          radius:  DOT_BASE,
-          targetR: DOT_BASE,
+          radius:  PLAIN_DOT_BASE,
+          targetR: PLAIN_DOT_BASE,
+          depth:   depth,
+          driftAmp: driftAmp,
+          driftSpeed: driftSpeed,
+          seed:    seed,
+          twinkle: false,
         };
 
-        if (isTwinkle) {
-          // Each twinkle dot gets unique animation parameters
-          const rng2 = seededRandom(seed + 999);
-          const rng3 = seededRandom(seed + 1777);
-          dot.twinkle = true;
-          dot.twinklePhase = rng2 * Math.PI * 2;  // random start phase
-          dot.twinkleSpeed = TWINKLE_SPEED_MIN +
-            rng3 * (TWINKLE_SPEED_MAX - TWINKLE_SPEED_MIN);
-          dot.twinkleMax = TWINKLE_MIN_OPACITY +
-            seededRandom(seed + 2345) * (TWINKLE_MAX_OPACITY - TWINKLE_MIN_OPACITY);
+        // Twinkle assignment (only a small subset of dots twinkle)
+        if (rng < TOTAL_TWINKLE_CHANCE) {
+          let acc = 0;
+          for (const tier of TIERS) {
+            acc += tier.chance;
+            if (rng < acc) {
+              dot.twinkle  = true;
+              dot.tier     = tier;
+
+              const rng2 = seededRandom(seed + 999);
+              const rng3 = seededRandom(seed + 1777);
+              const rng4 = seededRandom(seed + 2345);
+              const rng5 = seededRandom(seed + 3141);
+              const rng6 = seededRandom(seed + 4567);
+
+              // Dual sine wave parameters
+              dot.phaseA = rng2 * Math.PI * 2;
+              dot.phaseB = rng5 * Math.PI * 2;
+              dot.speedA = WAVE_SPEED_A_MIN + rng3 * (WAVE_SPEED_A_MAX - WAVE_SPEED_A_MIN);
+              dot.speedB = WAVE_SPEED_B_MIN + rng6 * (WAVE_SPEED_B_MAX - WAVE_SPEED_B_MIN);
+              dot.twinkleMax = 0.15 + rng4 * (tier.twinkleMax - 0.15);
+
+              // Drift parameters
+              dot.driftPhaseX = rng2 * Math.PI * 2;
+              dot.driftPhaseY = rng3 * Math.PI * 2;
+              dot.driftAmp    = tier.driftAmp;
+              dot.driftSpeed  = tier.driftSpeed * (0.8 + rng4 * 0.4);
+
+              // Flare parameters (extremely rare, only near dots, disabled on mobile)
+              dot.canFlare    = !isMobile && tier.flareChance > 0 && rng4 < tier.flareChance;
+              dot.flarePhase  = rng5 * Math.PI * 2;
+              dot.flareSpeed  = 0.0002 + rng6 * 0.0003;
+
+              break;
+            }
+          }
         }
 
         dots.push(dot);
@@ -131,79 +216,255 @@
 
   function draw(timestamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const colors    = getColors();
-    const staticC   = hexToRgb(colors.static);
-    const cursorC   = hexToRgb(colors.cursor);
-    const twinkleC  = getTwinkleColor();
-    const now       = timestamp || performance.now();
+    
+    // Smoothly interpolate colors frame-by-frame
+    const colors = getColors();
+    const targetStaticRGB = hexToRgb(colors.static);
+    const targetCursorRGB = hexToRgb(colors.cursor);
 
-    // Smoothly transition global opacity
+    currentStaticColor.r = lerp(currentStaticColor.r, targetStaticRGB.r, 0.08);
+    currentStaticColor.g = lerp(currentStaticColor.g, targetStaticRGB.g, 0.08);
+    currentStaticColor.b = lerp(currentStaticColor.b, targetStaticRGB.b, 0.08);
+
+    currentCursorColor.r = lerp(currentCursorColor.r, targetCursorRGB.r, 0.08);
+    currentCursorColor.g = lerp(currentCursorColor.g, targetCursorRGB.g, 0.08);
+    currentCursorColor.b = lerp(currentCursorColor.b, targetCursorRGB.b, 0.08);
+
+    for (const key of ['far', 'mid', 'near']) {
+      const targetT = getTwinkleColor(key);
+      currentTwinkleColors[key].r = lerp(currentTwinkleColors[key].r, targetT.r, 0.08);
+      currentTwinkleColors[key].g = lerp(currentTwinkleColors[key].g, targetT.g, 0.08);
+      currentTwinkleColors[key].b = lerp(currentTwinkleColors[key].b, targetT.b, 0.08);
+    }
+
+    const staticC = currentStaticColor;
+    const cursorC = currentCursorColor;
+    const now     = timestamp || performance.now();
+    const isDark  = theme === 'dark';
+
+    // Smooth global opacity
     const targetOpacity = isIdle ? OPACITY_IDLE : OPACITY_ACTIVE;
     globalOpacity = lerp(globalOpacity, targetOpacity, FADE_SPEED);
 
+    // Smooth cursor position
+    smoothMouse.x = lerp(smoothMouse.x, mouse.x, 0.15);
+    smoothMouse.y = lerp(smoothMouse.y, mouse.y, 0.15);
+
+    // Spawning spark
+    if (!prefersReduced && now >= nextSparkAt) {
+      if (dots.length > 0) {
+        const randDot = dots[(Math.random() * dots.length) | 0];
+        sparks.push({
+          dot: randDot,
+          start: now,
+          duration: SPARK_DURATION[0] + Math.random() * (SPARK_DURATION[1] - SPARK_DURATION[0]),
+          len: SPARK_LEN[0] + Math.random() * (SPARK_LEN[1] - SPARK_LEN[0]),
+          axis: Math.random() < 0.5 ? 'h' : 'v',
+        });
+      }
+      nextSparkAt = now + SPARK_INTERVAL[0] + Math.random() * (SPARK_INTERVAL[1] - SPARK_INTERVAL[0]);
+    }
+
+    // ── Ambient cursor spotlight glow (only when mouse is active & desktop & not reduced motion) ──
+    if (smoothMouse.x > -1000 && !isMobile && !prefersReduced) {
+      const glowAlpha = CURSOR_GLOW_ALPHA * globalOpacity;
+      const grad = ctx.createRadialGradient(
+        smoothMouse.x, smoothMouse.y, 0,
+        smoothMouse.x, smoothMouse.y, CURSOR_GLOW_RADIUS
+      );
+      if (isDark) {
+        grad.addColorStop(0, `rgba(59,130,246,${(glowAlpha * 1.2).toFixed(3)})`);
+        grad.addColorStop(0.5, `rgba(37,99,235,${(glowAlpha * 0.4).toFixed(3)})`);
+        grad.addColorStop(1, 'rgba(37,99,235,0)');
+      } else {
+        grad.addColorStop(0, `rgba(37,99,235,${(glowAlpha * 0.6).toFixed(3)})`);
+        grad.addColorStop(0.6, `rgba(37,99,235,${(glowAlpha * 0.2).toFixed(3)})`);
+        grad.addColorStop(1, 'rgba(37,99,235,0)');
+      }
+      ctx.fillStyle = grad;
+      ctx.fillRect(
+        smoothMouse.x - CURSOR_GLOW_RADIUS,
+        smoothMouse.y - CURSOR_GLOW_RADIUS,
+        CURSOR_GLOW_RADIUS * 2,
+        CURSOR_GLOW_RADIUS * 2
+      );
+    }
+
+    // ── Draw dots ──
     for (const dot of dots) {
+      // 1. Move/Drift & Wave ripple math
+      if (!prefersReduced) {
+        const timeFactor = now * dot.driftSpeed;
+        
+        // Gentle local float/drift
+        const localDriftX = Math.sin(timeFactor + dot.seed) * dot.driftAmp;
+        const localDriftY = Math.cos(timeFactor * 0.9 + dot.seed * 1.3) * dot.driftAmp;
+
+        // Subtle wave passing across screen
+        const waveVal = now * 0.0005;
+        const rippleX = Math.sin(waveVal + (dot.baseX * 0.004) + (dot.baseY * 0.003)) * 1.2 * dot.depth;
+        const rippleY = Math.cos(waveVal * 0.85 + (dot.baseX * 0.003) + (dot.baseY * 0.004)) * 1.2 * dot.depth;
+
+        dot.x = dot.baseX + localDriftX + rippleX;
+        dot.y = dot.baseY + localDriftY + rippleY;
+      } else {
+        dot.x = dot.baseX;
+        dot.y = dot.baseY;
+      }
+
       const dx   = mouse.x - dot.x;
       const dy   = mouse.y - dot.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
+      const influence = Math.max(0, 1 - dist / RADIUS);
 
-      const influence = Math.max(0, 1 - dist / RADIUS) * mobileScale;
-
-      dot.targetR = DOT_BASE + (DOT_MAX - DOT_BASE) * influence;
-
-      // ── Twinkle logic ──
+      // 2. Twinkle logic (dual sine)
       let twinkleAlpha = 0;
       let twinkleRadiusBoost = 0;
+      let twinkleC = null;
+      let isFlaring = false;
 
-      if (dot.twinkle) {
-        // Sine wave produces smooth 0→1→0 oscillation
-        const wave = Math.sin(now * dot.twinkleSpeed + dot.twinklePhase);
-        // Map from [-1,1] to [0,1], then apply easing for softer peaks
-        const t01 = (wave + 1) * 0.5;
-        const eased = t01 * t01; // quadratic ease — sharper fade-in/out
+      if (dot.twinkle && !prefersReduced) {
+        const tier = dot.tier;
+        twinkleC = currentTwinkleColors[tier.name];
+
+        const waveA = Math.sin(now * dot.speedA + dot.phaseA);
+        const waveB = Math.sin(now * dot.speedB + dot.phaseB);
+        const combined = (waveA * 0.65 + waveB * 0.35 + 1) * 0.5; // 0 to 1
+        const eased = combined * combined; // Quadratic easing for crispness
 
         twinkleAlpha = eased * dot.twinkleMax;
-        twinkleRadiusBoost = eased * TWINKLE_RADIUS_BOOST;
+        twinkleRadiusBoost = eased * (tier.dotMax - tier.dotBase) * 0.3;
 
-        // Suppress twinkle when cursor is nearby (spotlight dominates)
+        // Rare lens flare for near stars in dark mode
+        if (dot.canFlare && isDark) {
+          const flareWave = Math.sin(now * dot.flareSpeed + dot.flarePhase);
+          const flareT = Math.max(0, (flareWave - 0.88) / 0.12);
+          if (flareT > 0) {
+            isFlaring = true;
+            twinkleAlpha = Math.min(0.9, twinkleAlpha + flareT * 0.4);
+            twinkleRadiusBoost += flareT * 1.2;
+          }
+        }
+
+        // Suppress twinkling close to cursor to let spotlight shine cleanly
         const cursorSuppress = 1 - influence;
         twinkleAlpha *= cursorSuppress;
         twinkleRadiusBoost *= cursorSuppress;
+
+        dot.targetR = tier.dotBase + (tier.dotMax - tier.dotBase) * influence + twinkleRadiusBoost;
+      } else {
+        dot.targetR = PLAIN_DOT_BASE + (PLAIN_DOT_MAX - PLAIN_DOT_BASE) * influence;
       }
 
-      dot.targetR += twinkleRadiusBoost;
-      dot.radius  = lerp(dot.radius, dot.targetR, LERP_SPEED);
+      // Smooth radius transition
+      dot.radius = lerp(dot.radius, dot.targetR, LERP_SPEED);
 
-      // ── Color blending ──
+      // 3. Color blending (incorporating theme colors & cursor influence)
       const t = influence;
+      let cr = Math.round(staticC.r + (cursorC.r - staticC.r) * t);
+      let cg = Math.round(staticC.g + (cursorC.g - staticC.g) * t);
+      let cb = Math.round(staticC.b + (cursorC.b - staticC.b) * t);
+      
+      // Base alpha: static opacity at idle, brighter when cursor influence is high
+      let alpha = globalOpacity * (0.5 + 0.5 * influence);
 
-      // Base color: blend static → cursor based on cursor proximity
-      let r = Math.round(staticC.r + (cursorC.r - staticC.r) * t);
-      let g = Math.round(staticC.g + (cursorC.g - staticC.g) * t);
-      let b = Math.round(staticC.b + (cursorC.b - staticC.b) * t);
-
-      // Apply global opacity for idle fade
-      let alpha = globalOpacity * (0.6 + 0.4 * influence);
-
-      // Blend twinkle color on top (additive-like)
-      if (twinkleAlpha > 0.005) {
+      // Blend twinkle color (if twinkling and not suppressed)
+      if (dot.twinkle && twinkleAlpha > 0.005 && twinkleC && !prefersReduced) {
         const tw = twinkleAlpha;
-        r = Math.round(r + (twinkleC.r - r) * tw);
-        g = Math.round(g + (twinkleC.g - g) * tw);
-        b = Math.round(b + (twinkleC.b - b) * tw);
-        // Boost alpha for twinkling dots so they're visible even when idle
-        alpha = Math.min(1, alpha + twinkleAlpha * 0.8);
+        if (isDark) {
+          // Additive blend for luminous night sky feel
+          cr = Math.min(255, Math.round(cr + twinkleC.r * tw));
+          cg = Math.min(255, Math.round(cg + twinkleC.g * tw));
+          cb = Math.min(255, Math.round(cb + twinkleC.b * tw));
+          alpha = Math.min(0.95, alpha + twinkleAlpha * 0.8);
+        } else {
+          // Normal soft blend for light mode to stay clean
+          cr = Math.round(cr + (twinkleC.r - cr) * tw);
+          cg = Math.round(cg + (twinkleC.g - cg) * tw);
+          cb = Math.round(cb + (twinkleC.b - cb) * tw);
+          alpha = Math.min(0.7, alpha + twinkleAlpha * 0.4);
+        }
       }
 
+      // 4. Render dot onto canvas
+      // Render radial glow halo only for twinkle stars in dark mode to save performance
+      if (isDark && dot.twinkle && twinkleAlpha > 0.02 && dot.tier.glowSize > 0 && !isMobile && !prefersReduced) {
+        const glowR = dot.radius + dot.tier.glowSize * twinkleAlpha;
+        const grad = ctx.createRadialGradient(
+          dot.x, dot.y, dot.radius * 0.2,
+          dot.x, dot.y, glowR
+        );
+        grad.addColorStop(0, `rgba(${cr},${cg},${cb},${(alpha * 0.8).toFixed(3)})`);
+        grad.addColorStop(0.5, `rgba(${cr},${cg},${cb},${(alpha * 0.25).toFixed(3)})`);
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, glowR, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Draw solid bright core
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${Math.min(1, alpha * 1.2).toFixed(3)})`;
+        ctx.fill();
+
+        // Draw flare lines
+        if (isFlaring) {
+          const flarLen = dot.radius * 4;
+          const fAlpha = twinkleAlpha * 0.2;
+          ctx.strokeStyle = `rgba(${cr},${cg},${cb},${fAlpha.toFixed(3)})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(dot.x - flarLen, dot.y);
+          ctx.lineTo(dot.x + flarLen, dot.y);
+          ctx.moveTo(dot.x, dot.y - flarLen);
+          ctx.lineTo(dot.x, dot.y + flarLen);
+          ctx.stroke();
+        }
+      } else {
+        // Draw simple dot
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${alpha.toFixed(3)})`;
+        ctx.fill();
+      }
+    }
+
+    // ── Draw Sparks (horizontal / vertical glowing lines that expand and fade) ──
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i];
+      const progress = (now - s.start) / s.duration;
+      if (progress >= 1) {
+        sparks.splice(i, 1);
+        continue;
+      }
+      const envelope = Math.sin(progress * Math.PI); // 0 -> 1 -> 0
+      const len = s.len * envelope;
+      const alpha = (0.35 + 0.65 * envelope) * globalOpacity;
+
+      ctx.save();
+      ctx.strokeStyle = isDark ? `rgba(255,255,255,${alpha.toFixed(3)})` : `rgba(37,99,235,${alpha.toFixed(3)})`;
+      ctx.lineWidth = 1.6;
+      ctx.shadowColor = isDark ? 'rgba(59,130,246,0.55)' : 'rgba(37,99,235,0.3)';
+      ctx.shadowBlur = 6 * envelope;
+      
       ctx.beginPath();
-      ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
-      ctx.fill();
+      if (s.axis === 'h') {
+        ctx.moveTo(s.dot.x - len / 2, s.dot.y);
+        ctx.lineTo(s.dot.x + len / 2, s.dot.y);
+      } else {
+        ctx.moveTo(s.dot.x, s.dot.y - len / 2);
+        ctx.lineTo(s.dot.x, s.dot.y + len / 2);
+      }
+      ctx.stroke();
+      ctx.restore();
     }
 
     animId = requestAnimationFrame(draw);
   }
 
-  // Reset idle timer on mouse move
+  // Idle timer
   function resetIdleTimer() {
     isIdle = false;
     clearTimeout(idleTimer);
@@ -212,7 +473,7 @@
     }, IDLE_TIMEOUT);
   }
 
-  // Track mouse position
+  // Mouse tracking
   if (!isMobile) {
     window.addEventListener('mousemove', (e) => {
       mouse.x = e.clientX;
@@ -228,14 +489,14 @@
     });
   }
 
-  // Handle resize
+  // Resize
   window.addEventListener('resize', () => {
     cancelAnimationFrame(animId);
     resize();
     draw();
   });
 
-  // Re-theme when theme changes
+  // Theme change
   document.addEventListener('themeChange', (e) => {
     theme = e.detail.theme;
   });
@@ -253,14 +514,26 @@
   const icon    = document.getElementById('theme-icon');
   const html    = document.documentElement;
 
-  const saved   = localStorage.getItem('theme');
-  const initial = saved || 'light';
-
-  applyTheme(initial);
+  // Read initial theme set by early script, or default to light
+  const currentTheme = html.getAttribute('data-theme') || 'light';
+  
+  // Set correct class immediately on load
+  if (icon) {
+    icon.className = currentTheme === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
+  }
 
   btn.addEventListener('click', () => {
     const current = html.getAttribute('data-theme');
     const next    = current === 'dark' ? 'light' : 'dark';
+    
+    // Add rotating class for click feedback animation
+    if (icon) {
+      icon.classList.add('theme-animating');
+      setTimeout(() => {
+        icon.classList.remove('theme-animating');
+      }, 500);
+    }
+
     applyTheme(next);
     localStorage.setItem('theme', next);
   });
@@ -397,6 +670,7 @@
 
 /* ============================================
    6. MODALS + GALLERY
+      Dynamically handles all modal popups (modal-1 to modal-4)
    ============================================ */
 (function initModals() {
   const openBtns  = document.querySelectorAll('.open-modal');
@@ -615,17 +889,25 @@
     return;
   }
 
-  // Home section elements: reveal immediately on page load
-  // (they're already in viewport, no scroll needed)
+  // Home section elements: reveal immediately after preloader finishes
   const homeSection = document.getElementById('home');
   if (homeSection) {
     const homeReveals = homeSection.querySelectorAll(
       '.reveal, .reveal-left, .reveal-right, .reveal-up'
     );
-    // Small delay so the page loads first, then animate in
-    setTimeout(() => {
-      homeReveals.forEach(el => el.classList.add('revealed'));
-    }, 150);
+    
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+      document.addEventListener('preloaderComplete', () => {
+        setTimeout(() => {
+          homeReveals.forEach(el => el.classList.add('revealed'));
+        }, 150);
+      });
+    } else {
+      setTimeout(() => {
+        homeReveals.forEach(el => el.classList.add('revealed'));
+      }, 150);
+    }
   }
 
   // IntersectionObserver for all other elements
@@ -650,4 +932,51 @@
     if (homeSection && homeSection.contains(el)) return;
     observer.observe(el);
   });
+})();
+
+
+/* ============================================
+   PRELOADER SYSTEM
+   ============================================ */
+(function initPreloader() {
+  const preloader = document.getElementById('preloader');
+  const percentEl = document.getElementById('preloader-percent');
+  const circleBar = document.getElementById('preloader-circle-bar');
+  if (!preloader || !percentEl || !circleBar) return;
+
+  document.body.classList.add('preloader-active');
+
+  const totalLength = 283; // 2 * Math.PI * 45
+  let currentPercent = 0;
+  
+  // Simulate loading speed
+  const duration = 2200; // 2.2 seconds loading time
+  const intervalTime = 15; // update every 15ms
+  const step = 100 / (duration / intervalTime);
+
+  const timer = setInterval(() => {
+    currentPercent += step;
+    if (currentPercent >= 100) {
+      currentPercent = 100;
+      clearInterval(timer);
+      finishLoading();
+    }
+
+    const percentInt = Math.floor(currentPercent);
+    percentEl.textContent = `${percentInt}%`;
+    
+    // Update SVG circle stroke-dashoffset
+    const offset = totalLength - (totalLength * percentInt) / 100;
+    circleBar.style.strokeDashoffset = offset;
+  }, intervalTime);
+
+  function finishLoading() {
+    setTimeout(() => {
+      preloader.classList.add('loaded');
+      document.body.classList.remove('preloader-active');
+
+      // Dispatch custom event so home section reveals itself
+      document.dispatchEvent(new Event('preloaderComplete'));
+    }, 200); // short delay after reaching 100%
+  }
 })();
