@@ -66,6 +66,12 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--nav-height) + var(--nav-top-space) - 16px);
   overflow-x: hidden;
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE / Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none;                  /* Chrome / Safari / Opera */
 }
 
 body {
