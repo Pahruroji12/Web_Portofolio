@@ -84,6 +84,12 @@ body {
   overflow-x: hidden;
   width: 100%;
   position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
 
 /* Applied during theme switch for a consistent cross-component transition */
