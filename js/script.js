@@ -1,18 +1,69 @@
-/* =============================================
+/* 
    PORTFOLIO PAHRUROJI — script.js
    Includes:
+   - Preloader System
    - Interactive Dot Matrix Grid (canvas)
    - Dark / Light Mode + localStorage
-   - Hamburger Menu
-   - Smooth Scroll + Active Nav Link
+   - Navbar & Hamburger Menu
+   - Smooth Scroll & Active Nav Link (Scroll Spy)
    - Typing Effect
-   - Modal (Project Detail)
-   ============================================= */
+   - Scroll Reveal (IntersectionObserver)
+   - Project Modal Controller
+   - Gallery Slider System
+   - Video & Iframe Lifecycle
+   - Contact Form Validation & Fake Submit
+   - Scroll to Top
+   - Fullscreen Lightbox Image Preview
+   */
 
-/* ============================================
-   1. INTERACTIVE DOT MATRIX GRID (CANVAS)
-      + 3D Starfield Effect with Depth Tiers
-   ============================================ */
+// 1. PRELOADER SYSTEM 
+
+(function initPreloader() {
+  const preloader = document.getElementById('preloader');
+  const percentEl = document.getElementById('preloader-percent');
+  const circleBar = document.getElementById('preloader-circle-bar');
+  if (!preloader || !percentEl || !circleBar) return;
+
+  document.body.classList.add('preloader-active');
+
+  const totalLength = 283; // 2 * Math.PI * 45
+  let currentPercent = 0;
+  
+  // Simulate loading speed
+  const duration = 2200; // 2.2 seconds loading time
+  const intervalTime = 15; // update every 15ms
+  const step = 100 / (duration / intervalTime);
+
+  const timer = setInterval(() => {
+    currentPercent += step;
+    if (currentPercent >= 100) {
+      currentPercent = 100;
+      clearInterval(timer);
+      finishLoading();
+    }
+
+    const percentInt = Math.floor(currentPercent);
+    percentEl.textContent = `${percentInt}%`;
+    
+    // Update SVG circle stroke-dashoffset
+    const offset = totalLength - (totalLength * percentInt) / 100;
+    circleBar.style.strokeDashoffset = offset;
+  }, intervalTime);
+
+  function finishLoading() {
+    setTimeout(() => {
+      preloader.classList.add('loaded');
+      document.body.classList.remove('preloader-active');
+
+      // Dispatch custom event so home section reveals itself
+      document.dispatchEvent(new Event('preloaderComplete'));
+    }, 200); // short delay after reaching 100%
+  }
+})();
+
+
+// 2. INTERACTIVE DOT MATRIX GRID (CANVAS)
+
 (function initCanvas() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
@@ -505,10 +556,8 @@
   draw();
 })();
 
+// 3. DARK / LIGHT MODE
 
-/* ============================================
-   2. DARK / LIGHT MODE
-   ============================================ */
 (function initTheme() {
   const btn     = document.getElementById('theme-toggle');
   const icon    = document.getElementById('theme-icon');
@@ -526,6 +575,9 @@
     const current = html.getAttribute('data-theme');
     const next    = current === 'dark' ? 'light' : 'dark';
     
+    // Add theme-changing class for smooth transition
+    html.classList.add('theme-changing');
+    
     // Add rotating class for click feedback animation
     if (icon) {
       icon.classList.add('theme-animating');
@@ -534,14 +586,13 @@
       }, 500);
     }
 
-    // Add .theme-changing to synchronize all element transitions
-    html.classList.add('theme-changing');
-    setTimeout(() => {
-      html.classList.remove('theme-changing');
-    }, 480);
-
     applyTheme(next);
     localStorage.setItem('theme', next);
+
+    // Remove theme-changing class after transition completes (380ms)
+    setTimeout(() => {
+      html.classList.remove('theme-changing');
+    }, 380);
   });
 
   function applyTheme(t) {
@@ -555,9 +606,8 @@
 })();
 
 
-/* ============================================
-   3. HAMBURGER MENU
-   ============================================ */
+//   4. NAVBAR & HAMBURGER MENU
+
 (function initHamburger() {
   const hamburger = document.getElementById('hamburger');
   const hamIcon   = document.getElementById('hamburger-icon');
@@ -587,45 +637,142 @@
   });
 })();
 
+// 5. SMOOTH SCROLL & ACTIVE NAV LINK (SCROLL SPY)
 
-/* ============================================
-   4. ACTIVE NAV LINK (SCROLL SPY)
-   ============================================ */
-(function initScrollSpy() {
+(function initNavigation() {
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-link');
+  const anchorLinks = document.querySelectorAll('a[href^="#"]:not([href="#"])');
+  const navbar   = document.getElementById('navbar');
+  
+  let isScrolling = false;
+  let scrollTimeout = null;
 
+  // 1. Custom Smooth Scroll on Link Click
+  anchorLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      const targetSection = document.querySelector(href);
+      if (!targetSection) return;
+
+      e.preventDefault();
+
+      // Close hamburger if it is open (mobile view)
+      const navMenu = document.getElementById('nav-menu');
+      const hamIcon = document.getElementById('hamburger-icon');
+      if (navMenu && navMenu.classList.contains('open')) {
+        navMenu.classList.remove('open');
+        if (hamIcon) hamIcon.className = 'bx bx-menu';
+      }
+
+      // Calculate target position
+      const navbarHeight = navbar ? navbar.offsetHeight : 64;
+      
+      // Get the variables from CSS
+      const style = getComputedStyle(document.documentElement);
+      const topSpace = parseInt(style.getPropertyValue('--nav-top-space')) || 0;
+      // Kurangi offset tambahan agar konten section bergeser lebih naik
+      const extraOffset = -16 + topSpace;
+
+      // targetPosition = offset dari atas halaman ke target section, dikurangi offset navbar dan extra padding
+      const targetPosition = targetSection.getBoundingClientRect().top + window.scrollY - navbarHeight - extraOffset;
+
+      // Set flag to prevent Scroll Spy from overriding the active state during smooth scroll
+      isScrolling = true;
+      clearTimeout(scrollTimeout);
+
+      // Instantly set active class on corresponding nav-link (if it exists)
+      const matchingNavLink = document.querySelector(`.nav-link[href="${href}"]`);
+      if (matchingNavLink) {
+        navLinks.forEach(l => l.classList.toggle('active', l === matchingNavLink));
+      } else {
+        navLinks.forEach(l => l.classList.remove('active'));
+      }
+
+      // Scroll smoothly
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+
+      // Update URL hash without jumping
+      history.pushState(null, null, href);
+
+      // Reset scroll flag after smooth scroll ends (800ms)
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+      }, 800);
+    });
+  });
+
+  // 2. Scroll Spy logic
   function onScroll() {
-    const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height')) || 64;
-    const scrollY = window.scrollY + navHeight + 24;
+    if (isScrolling) return; // Skip updating during programmatic scroll
+
+    const navbarHeight = navbar ? navbar.offsetHeight : 64;
+    const topSpace = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-top-space')) || 0;
+    
+    // extraOffset is the offset used to match trigger line
+    const extraOffset = -16 + topSpace + 10; // Extra 10px buffer for sub-pixel calculation
+    const triggerLine = window.scrollY + navbarHeight + extraOffset;
+
+    let activeId = '';
+
     sections.forEach(sec => {
-      const top    = sec.offsetTop;
+      const top = sec.offsetTop;
       const height = sec.offsetHeight;
-      const id     = sec.getAttribute('id');
-      if (scrollY >= top && scrollY < top + height) {
-        navLinks.forEach(l => {
-          l.classList.toggle('active', l.getAttribute('href') === `#${id}`);
-        });
+      const id = sec.getAttribute('id');
+      
+      // If the trigger line is past the top of the section and has not left the section
+      if (triggerLine >= top && triggerLine < top + height) {
+        activeId = id;
       }
     });
+
+    // Special case: at the very top of the page, force Home to be active
+    if (window.scrollY < 50) {
+      activeId = 'home';
+    }
+
+    // Special case: at the very bottom of the page, force last section (Contact) to be active
+    const isAtBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 20);
+    if (isAtBottom && sections.length > 0) {
+      activeId = sections[sections.length - 1].getAttribute('id');
+    }
+
+    if (activeId) {
+      navLinks.forEach(l => {
+        l.classList.toggle('active', l.getAttribute('href') === `#${activeId}`);
+      });
+    }
   }
 
-  window.addEventListener('scroll', onScroll, { passive: true });
+  // Optimize scroll performance with requestAnimationFrame
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        onScroll();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
   onScroll();
 })();
 
+//6. TYPING EFFECT
 
-/* ============================================
-   5. TYPING EFFECT
-   ============================================ */
 (function initTyping() {
   const el = document.getElementById('typing-text');
   if (!el) return;
 
   const words = [
     'IT Support',
-    'Web Development',
-    'Mobile Development',
+    'Mahasiswa Sistem Informasi',
+    'Web Development Enthusiast',
+    'Mobile Development Enthusiast',
   ];
 
   let wordIdx  = 0;
@@ -674,11 +821,74 @@
   tick();
 })();
 
+// 7. SCROLL REVEAL (IntersectionObserver)
 
-/* ============================================
-   6. MODALS + GALLERY
-      Dynamically handles all modal popups (modal-1 to modal-4)
-   ============================================ */
+(function initScrollReveal() {
+  // Respect user preference for reduced motion
+  const prefersReducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches;
+
+  // Select all elements with reveal classes
+  const revealElements = document.querySelectorAll(
+    '.reveal, .reveal-left, .reveal-right, .reveal-up'
+  );
+
+  if (!revealElements.length) return;
+
+  // If user prefers reduced motion, show everything immediately
+  if (prefersReducedMotion) {
+    revealElements.forEach(el => el.classList.add('revealed'));
+    return;
+  }
+
+  // Home section elements: reveal immediately after preloader finishes
+  const homeSection = document.getElementById('home');
+  if (homeSection) {
+    const homeReveals = homeSection.querySelectorAll(
+      '.reveal, .reveal-left, .reveal-right, .reveal-up'
+    );
+    
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+      document.addEventListener('preloaderComplete', () => {
+        setTimeout(() => {
+          homeReveals.forEach(el => el.classList.add('revealed'));
+        }, 150);
+      });
+    } else {
+      setTimeout(() => {
+        homeReveals.forEach(el => el.classList.add('revealed'));
+      }, 150);
+    }
+  }
+
+  // IntersectionObserver for all other elements
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target); // animate only once
+        }
+      });
+    },
+    {
+      threshold: 0.12,    // trigger when 12% of element is visible
+      rootMargin: '0px 0px -40px 0px' // slight offset from bottom edge
+    }
+  );
+
+  // Observe all reveal elements (except home ones already handled)
+  revealElements.forEach(el => {
+    // Skip home section elements — they animate on load
+    if (homeSection && homeSection.contains(el)) return;
+    observer.observe(el);
+  });
+})();
+
+// 8. PROJECT MODAL CONTROLLER
+
 (function initModals() {
   const openBtns  = document.querySelectorAll('.open-modal');
   const overlays  = document.querySelectorAll('.modal-overlay');
@@ -749,12 +959,15 @@
       });
     }
   });
+})();
 
-  /* ── Gallery Setup ── */
+// 9. GALLERY SLIDER SYSTEM
+
+(function initGallerySlider() {
   const gallerySets = document.querySelectorAll('.gallery-thumbnails');
 
   gallerySets.forEach(container => {
-    const id       = container.id;                              // e.g. "gallery-thumbs-1"
+    const id       = container.id;
     const suffix   = id ? id.replace('gallery-thumbs-', '') : '';
     const heroImg  = document.getElementById('gallery-hero-' + suffix);
     const caption  = document.getElementById('gallery-caption-' + suffix);
@@ -768,7 +981,6 @@
     let currentIdx = 0;
     const total    = thumbs.length;
 
-    // ── Shared navigation function ──
     function navigateToIndex(idx, animate) {
       if (idx < 0) idx = total - 1;
       if (idx >= total) idx = 0;
@@ -780,18 +992,14 @@
       const alt   = thumb.dataset.alt || '';
       const cap   = thumb.dataset.caption || '';
 
-      // Update active thumbnail
       thumbs.forEach(t => t.classList.remove('active'));
       thumb.classList.add('active');
 
-      // Auto-scroll thumbnail into view
       thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
-      // Update counter
       if (counter) counter.textContent = (idx + 1) + ' / ' + total;
 
       if (animate) {
-        // Smooth fade transition
         heroImg.classList.add('fade-out');
         setTimeout(() => {
           heroImg.src = src;
@@ -806,7 +1014,6 @@
       }
     }
 
-    // ── Thumbnail clicks ──
     container.addEventListener('click', (e) => {
       const thumb = e.target.closest('.gallery-thumb');
       if (!thumb) return;
@@ -814,7 +1021,6 @@
       if (idx !== -1) navigateToIndex(idx, true);
     });
 
-    // ── Prev / Next buttons ──
     if (prevBtn) {
       prevBtn.addEventListener('click', () => {
         navigateToIndex(currentIdx - 1, true);
@@ -826,9 +1032,7 @@
       });
     }
 
-    // ── Keyboard arrows (when modal is active) ──
     document.addEventListener('keydown', (e) => {
-      // Only react if the modal containing this gallery is active
       const modal = container.closest('.modal-overlay');
       if (!modal || !modal.classList.contains('active')) return;
 
@@ -841,7 +1045,6 @@
       }
     });
 
-    // ── Reset gallery on modal close ──
     const modal = container.closest('.modal-overlay');
     if (modal) {
       const observer = new MutationObserver((mutations) => {
@@ -856,10 +1059,128 @@
   });
 })();
 
+// 10. VIDEO & IFRAME LIFECYCLE
+// (Pausing and reloading is handled dynamically inside Section 8: Project Modal Controller)
 
-/* ============================================
-   7. SCROLL TO TOP
-   ============================================ */
+//11. CONTACT FORM VALIDATION & FAKE SUBMIT
+
+(function initContactForm() {
+  const sendBtn = document.querySelector('.contact-send-btn');
+  const nameInput = document.getElementById('contact-name');
+  const emailInput = document.getElementById('contact-email');
+  const subjectInput = document.getElementById('contact-subject');
+  const messageInput = document.getElementById('contact-message');
+
+  if (!sendBtn || !nameInput || !emailInput || !subjectInput || !messageInput) return;
+
+  let toastContainer = document.querySelector('.toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+  }
+
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+    
+    const iconClass = type === 'success' ? 'bx bxs-check-circle' : 'bx bxs-error-circle';
+    
+    toast.innerHTML = `
+      <i class='${iconClass} toast-icon'></i>
+      <div class="toast-message">${message}</div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 400);
+    }, 4000);
+  }
+
+  function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  const inputs = [nameInput, emailInput, subjectInput, messageInput];
+  inputs.forEach(input => {
+    input.addEventListener('input', () => {
+      if (input.setCustomValidity) {
+        input.setCustomValidity('');
+      }
+      if (input.value.trim() !== '') {
+        input.classList.remove('error');
+      }
+    });
+  });
+
+  sendBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    inputs.forEach(input => {
+      input.classList.remove('error');
+      if (input.setCustomValidity) {
+        input.setCustomValidity('');
+      }
+    });
+    
+    if (!nameInput.value.trim()) {
+      nameInput.classList.add('error');
+      nameInput.reportValidity();
+      return;
+    }
+    
+    if (!emailInput.value.trim()) {
+      emailInput.classList.add('error');
+      emailInput.reportValidity();
+      return;
+    } else if (!validateEmail(emailInput.value.trim())) {
+      emailInput.classList.add('error');
+      emailInput.setCustomValidity('Format email tidak valid.');
+      emailInput.reportValidity();
+      return;
+    }
+    
+    if (!subjectInput.value.trim()) {
+      subjectInput.classList.add('error');
+      subjectInput.reportValidity();
+      return;
+    }
+    
+    if (!messageInput.value.trim()) {
+      messageInput.classList.add('error');
+      messageInput.reportValidity();
+      return;
+    }
+
+    const originalContent = sendBtn.innerHTML;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = `<i class='bx bx-loader-alt bx-spin'></i> Mengirim...`;
+    
+    setTimeout(() => {
+      showToast('Pesan berhasil dikirim!', 'success');
+      
+      nameInput.value = '';
+      emailInput.value = '';
+      subjectInput.value = '';
+      messageInput.value = '';
+      
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = originalContent;
+    }, 1500);
+  });
+})();
+
+
+//12. SCROLL TO TOP
+
 (function initScrollTop() {
   const btn = document.getElementById('scroll-top');
   if (!btn) return;
@@ -874,116 +1195,121 @@
 })();
 
 
-/* ============================================
-   8. SCROLL REVEAL (IntersectionObserver)
-   ============================================ */
-(function initScrollReveal() {
-  // Respect user preference for reduced motion
-  const prefersReducedMotion = window.matchMedia(
-    '(prefers-reduced-motion: reduce)'
-  ).matches;
+//13. LIGHTBOX (FULLSCREEN IMAGE PREVIEW)
 
-  // Select all elements with reveal classes
-  const revealElements = document.querySelectorAll(
-    '.reveal, .reveal-left, .reveal-right, .reveal-up'
-  );
+(function initLightbox() {
+  const targets = document.querySelectorAll('.gallery-hero-img, .preview-wrap img');
+  if (targets.length === 0) return;
 
-  if (!revealElements.length) return;
-
-  // If user prefers reduced motion, show everything immediately
-  if (prefersReducedMotion) {
-    revealElements.forEach(el => el.classList.add('revealed'));
-    return;
-  }
-
-  // Home section elements: reveal immediately after preloader finishes
-  const homeSection = document.getElementById('home');
-  if (homeSection) {
-    const homeReveals = homeSection.querySelectorAll(
-      '.reveal, .reveal-left, .reveal-right, .reveal-up'
-    );
+  let lightbox = document.querySelector('.lightbox-overlay');
+  if (!lightbox) {
+    lightbox = document.createElement('div');
+    lightbox.className = 'lightbox-overlay';
+    lightbox.innerHTML = `
+      <button class="lightbox-close" aria-label="Tutup"><i class='bx bx-x'></i></button>
+      <button class="lightbox-nav lightbox-nav--prev" aria-label="Gambar sebelumnya"><i class='bx bx-chevron-left'></i></button>
+      <button class="lightbox-nav lightbox-nav--next" aria-label="Gambar berikutnya"><i class='bx bx-chevron-right'></i></button>
+      <img class="lightbox-img" src="" alt="Full Screen Preview" />
+    `;
+    document.body.appendChild(lightbox);
     
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-      document.addEventListener('preloaderComplete', () => {
-        setTimeout(() => {
-          homeReveals.forEach(el => el.classList.add('revealed'));
-        }, 150);
-      });
-    } else {
-      setTimeout(() => {
-        homeReveals.forEach(el => el.classList.add('revealed'));
-      }, 150);
-    }
-  }
-
-  // IntersectionObserver for all other elements
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          observer.unobserve(entry.target); // animate only once
+    lightbox.addEventListener('click', (e) => {
+      const img = lightbox.querySelector('.lightbox-img');
+      const isNav = e.target.closest('.lightbox-nav');
+      if (e.target !== img && !isNav) {
+        lightbox.classList.remove('active');
+        const activeModals = document.querySelectorAll('.modal-overlay.active');
+        if (activeModals.length === 0) {
+          document.body.style.overflow = '';
         }
-      });
-    },
-    {
-      threshold: 0.12,    // trigger when 12% of element is visible
-      rootMargin: '0px 0px -40px 0px' // slight offset from bottom edge
-    }
-  );
+      }
+    });
 
-  // Observe all reveal elements (except home ones already handled)
-  revealElements.forEach(el => {
-    // Skip home section elements — they animate on load
-    if (homeSection && homeSection.contains(el)) return;
-    observer.observe(el);
-  });
-})();
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
 
+      if (e.key === 'Escape') {
+        lightbox.classList.remove('active');
+        const activeModals = document.querySelectorAll('.modal-overlay.active');
+        if (activeModals.length === 0) {
+          document.body.style.overflow = '';
+        }
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigateLightbox('prev');
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateLightbox('next');
+      }
+    });
 
-/* ============================================
-   PRELOADER SYSTEM
-   ============================================ */
-(function initPreloader() {
-  const preloader = document.getElementById('preloader');
-  const percentEl = document.getElementById('preloader-percent');
-  const circleBar = document.getElementById('preloader-circle-bar');
-  if (!preloader || !percentEl || !circleBar) return;
+    const prevBtn = lightbox.querySelector('.lightbox-nav--prev');
+    const nextBtn = lightbox.querySelector('.lightbox-nav--next');
 
-  document.body.classList.add('preloader-active');
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigateLightbox('prev');
+    });
 
-  const totalLength = 283; // 2 * Math.PI * 45
-  let currentPercent = 0;
-  
-  // Simulate loading speed
-  const duration = 2200; // 2.2 seconds loading time
-  const intervalTime = 15; // update every 15ms
-  const step = 100 / (duration / intervalTime);
-
-  const timer = setInterval(() => {
-    currentPercent += step;
-    if (currentPercent >= 100) {
-      currentPercent = 100;
-      clearInterval(timer);
-      finishLoading();
-    }
-
-    const percentInt = Math.floor(currentPercent);
-    percentEl.textContent = `${percentInt}%`;
-    
-    // Update SVG circle stroke-dashoffset
-    const offset = totalLength - (totalLength * percentInt) / 100;
-    circleBar.style.strokeDashoffset = offset;
-  }, intervalTime);
-
-  function finishLoading() {
-    setTimeout(() => {
-      preloader.classList.add('loaded');
-      document.body.classList.remove('preloader-active');
-
-      // Dispatch custom event so home section reveals itself
-      document.dispatchEvent(new Event('preloaderComplete'));
-    }, 200); // short delay after reaching 100%
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigateLightbox('next');
+    });
   }
+
+  function navigateLightbox(direction) {
+    const activeModal = document.querySelector('.modal-overlay.active');
+    if (!activeModal) return;
+
+    const thumbs = Array.from(activeModal.querySelectorAll('.gallery-thumb'));
+    if (thumbs.length <= 1) return;
+
+    const activeThumb = activeModal.querySelector('.gallery-thumb.active');
+    const activeIdx = thumbs.indexOf(activeThumb);
+
+    let targetIdx = 0;
+    if (direction === 'next') {
+      targetIdx = (activeIdx + 1) % thumbs.length;
+    } else {
+      targetIdx = (activeIdx - 1 + thumbs.length) % thumbs.length;
+    }
+
+    thumbs[targetIdx].click();
+
+    const lightboxImg = lightbox.querySelector('.lightbox-img');
+    if (lightboxImg) {
+      lightboxImg.src = thumbs[targetIdx].dataset.src;
+      lightboxImg.alt = thumbs[targetIdx].dataset.alt || '';
+    }
+  }
+
+  targets.forEach(img => {
+    img.style.cursor = 'zoom-in';
+    img.title = 'Klik untuk melihat ukuran penuh';
+    
+    img.addEventListener('click', () => {
+      const src = img.getAttribute('src');
+      const alt = img.getAttribute('alt') || '';
+      
+      const lightboxImg = lightbox.querySelector('.lightbox-img');
+      if (lightboxImg) {
+        lightboxImg.src = src;
+        lightboxImg.alt = alt;
+
+        const activeModal = document.querySelector('.modal-overlay.active');
+        const prevBtn = lightbox.querySelector('.lightbox-nav--prev');
+        const nextBtn = lightbox.querySelector('.lightbox-nav--next');
+        
+        if (activeModal && activeModal.querySelectorAll('.gallery-thumb').length > 1) {
+          prevBtn.classList.remove('hidden');
+          nextBtn.classList.remove('hidden');
+        } else {
+          prevBtn.classList.add('hidden');
+          nextBtn.classList.add('hidden');
+        }
+
+        lightbox.classList.add('active');
+      }
+    });
+  });
 })();
