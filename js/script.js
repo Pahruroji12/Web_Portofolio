@@ -534,6 +534,12 @@
       }, 500);
     }
 
+    // Add .theme-changing to synchronize all element transitions
+    html.classList.add('theme-changing');
+    setTimeout(() => {
+      html.classList.remove('theme-changing');
+    }, 480);
+
     applyTheme(next);
     localStorage.setItem('theme', next);
   });
@@ -590,7 +596,8 @@
   const navLinks = document.querySelectorAll('.nav-link');
 
   function onScroll() {
-    const scrollY = window.scrollY + 80;
+    const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height')) || 64;
+    const scrollY = window.scrollY + navHeight + 24;
     sections.forEach(sec => {
       const top    = sec.offsetTop;
       const height = sec.offsetHeight;
