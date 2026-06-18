@@ -11,7 +11,7 @@
   --accent:      #2563EB;
   --accent-hover:#1D4ED8;
   --border:      #E5E7EB;
-  --nav-bg:      rgba(255,255,255,0.85);
+  --nav-bg:      rgba(255,255,255,0.88);
   --shadow:      0 4px 24px rgba(0,0,0,0.07);
   --shadow-hover:0 8px 32px rgba(0,0,0,0.12);
   --tag-bg:      #EFF6FF;
@@ -19,6 +19,19 @@
   --overlay-bg:  rgba(0,0,0,0.5);
   --transition:  all 0.3s ease;
   --accent-glow: rgba(37, 99, 235, 0.15);
+
+  /* Navbar layout variables */
+  --nav-height:    64px;
+  --nav-top-space: 0px;
+
+  /* Shared theme transition — apply to all themeable elements */
+  --theme-transition:
+    background-color 0.38s ease,
+    color            0.38s ease,
+    border-color     0.38s ease,
+    box-shadow       0.38s ease,
+    opacity          0.38s ease,
+    filter           0.38s ease;
 }
 
 [data-theme="dark"] {
@@ -31,7 +44,7 @@
   --accent:      #3B82F6;
   --accent-hover:#60A5FA;
   --border:      #1F2226;
-  --nav-bg:      rgba(11,11,12,0.85);
+  --nav-bg:      rgba(11,11,12,0.90);
   --shadow:      0 4px 24px rgba(0,0,0,0.4);
   --shadow-hover:0 8px 32px rgba(0,0,0,0.6);
   --tag-bg:      #1E3A5F;
@@ -51,6 +64,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-height) + var(--nav-top-space) + 24px);
 }
 
 body {
@@ -59,8 +73,20 @@ body {
   color: var(--text-main);
   line-height: 1.6;
   font-size: 16px;
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition: background-color 0.38s ease, color 0.38s ease;
   overflow-x: hidden;
+}
+
+/* Applied during theme switch for a consistent cross-component transition */
+html.theme-changing,
+html.theme-changing * {
+  transition:
+    background-color 0.38s ease,
+    color            0.38s ease,
+    border-color     0.38s ease,
+    box-shadow       0.38s ease,
+    opacity          0.38s ease,
+    filter           0.38s ease !important;
 }
 
 /* Group transition for text elements with explicit color settings */
@@ -88,7 +114,7 @@ body {
 .modal-section h4,
 .modal-section p,
 .modal-section ul li {
-  transition: color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  transition: color 0.38s ease, background-color 0.38s ease, border-color 0.38s ease, box-shadow 0.38s ease;
 }
 
 /* =========================================
@@ -111,6 +137,7 @@ body {
   position: relative;
   z-index: 1;
   padding: 100px 0;
+  scroll-margin-top: calc(var(--nav-height) + var(--nav-top-space) + 24px);
 }
 
 .section-container {
@@ -157,14 +184,16 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
-  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  /* Use padding-top for safe-area support; do NOT add extra top offset */
+  padding-top: calc(var(--nav-top-space) + env(safe-area-inset-top, 0px));
+  transition: var(--theme-transition);
 }
 
 .nav-container {
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 64px;
+  height: var(--nav-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -178,6 +207,7 @@ body {
   text-decoration: none;
   letter-spacing: -0.02em;
   flex-shrink: 0;
+  transition: var(--theme-transition);
 }
 
 .nav-menu {
@@ -353,7 +383,7 @@ body {
   align-items: flex-end;
   justify-content: center;
   background: transparent;
-  transition: background-color 0.35s ease, border-color 0.35s ease;
+  transition: background-color 0.38s ease, border-color 0.38s ease;
 }
 
 /* Decorative blobs behind the photo */
@@ -519,10 +549,10 @@ body {
   flex-direction: column;
   gap: 12px;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              background-color 0.35s ease,
-              color 0.35s ease,
-              border-color 0.35s ease, 
-              box-shadow 0.35s ease;
+              background-color 0.38s ease,
+              color 0.38s ease,
+              border-color 0.38s ease, 
+              box-shadow 0.38s ease;
 }
 
 .about-highlight-card:hover {
@@ -572,10 +602,10 @@ body {
   flex-direction: column;
   gap: 20px;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              background-color 0.35s ease,
-              color 0.35s ease,
-              border-color 0.35s ease, 
-              box-shadow 0.35s ease;
+              background-color 0.38s ease,
+              color 0.38s ease,
+              border-color 0.38s ease, 
+              box-shadow 0.38s ease;
 }
 
 .about-card:hover {
@@ -644,10 +674,10 @@ body {
   border-radius: 8px;
   font-weight: 500;
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-              background-color 0.35s ease, 
-              color 0.35s ease,
-              border-color 0.35s ease,
-              box-shadow 0.35s ease;
+              background-color 0.38s ease, 
+              color 0.38s ease,
+              border-color 0.38s ease,
+              box-shadow 0.38s ease;
 }
 
 .tag:hover {
@@ -681,10 +711,10 @@ body {
   padding: 28px;
   box-shadow: var(--shadow);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              background-color 0.35s ease,
-              color 0.35s ease,
-              border-color 0.35s ease, 
-              box-shadow 0.35s ease;
+              background-color 0.38s ease,
+              color 0.38s ease,
+              border-color 0.38s ease, 
+              box-shadow 0.38s ease;
 }
 
 .skill-card:hover {
@@ -730,10 +760,10 @@ body {
   font-weight: 500;
   color: var(--text-sec);
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-              background-color 0.35s ease,
-              color 0.35s ease,
-              border-color 0.35s ease,
-              box-shadow 0.35s ease;
+              background-color 0.38s ease,
+              color 0.38s ease,
+              border-color 0.38s ease,
+              box-shadow 0.38s ease;
   cursor: default;
 }
 
@@ -785,7 +815,7 @@ body {
   border: 1px solid var(--border);
   overflow: hidden;
   box-shadow: var(--shadow);
-  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.38s ease, border-color 0.38s ease, box-shadow 0.38s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .project-card:hover {
@@ -798,7 +828,7 @@ body {
   height: 180px;
   background: var(--border);
   overflow: hidden;
-  transition: background-color 0.35s ease, border-color 0.35s ease;
+  transition: background-color 0.38s ease, border-color 0.38s ease;
 }
 
 .project-thumb-placeholder {
@@ -870,7 +900,7 @@ body {
   border-radius: 6px;
   font-size: 0.78rem;
   font-weight: 600;
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition: background-color 0.38s ease, color 0.38s ease;
 }
 
 /* =========================================
@@ -907,7 +937,7 @@ body {
   border-radius: 12px;
   padding: 16px 20px;
   text-decoration: none;
-  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.38s ease, border-color 0.38s ease, box-shadow 0.38s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow);
 }
 
@@ -928,7 +958,7 @@ body {
   flex-shrink: 0;
   font-size: 1.4rem;
   color: var(--accent);
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition: background-color 0.38s ease, color 0.38s ease;
 }
 
 .cic-text {
@@ -965,7 +995,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  transition: background-color 0.38s ease, border-color 0.38s ease, box-shadow 0.38s ease;
 }
 
 .form-row {
@@ -984,7 +1014,7 @@ body {
   font-family: inherit;
   font-size: 0.9rem;
   outline: none;
-  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, box-shadow 0.2s ease;
+  transition: background-color 0.38s ease, border-color 0.38s ease, color 0.38s ease, box-shadow 0.2s ease;
 }
 
 .form-input::placeholder {
@@ -1016,7 +1046,7 @@ body {
   background: var(--bg-card);
   border-top: 1px solid var(--border);
   padding: 40px 24px 28px;
-  transition: background-color 0.35s ease, border-color 0.35s ease;
+  transition: background-color 0.38s ease, border-color 0.38s ease;
 }
 
 .footer-inner {
@@ -1106,10 +1136,10 @@ body {
   font-size: 1.15rem;
   text-decoration: none;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              background-color 0.35s ease, 
-              color 0.35s ease, 
-              border-color 0.35s ease, 
-              box-shadow 0.35s ease;
+              background-color 0.38s ease, 
+              color 0.38s ease, 
+              border-color 0.38s ease, 
+              box-shadow 0.38s ease;
   border: 1px solid var(--border);
 }
 
@@ -1150,7 +1180,7 @@ body {
   opacity: 0;
   transform: translateY(16px);
   pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.35s ease, box-shadow 0.35s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.38s ease, box-shadow 0.38s ease;
 }
 
 .scroll-top.visible {
@@ -1197,7 +1227,7 @@ body {
   padding: 24px env(safe-area-inset-right, 0) 24px env(safe-area-inset-left, 0);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.35s ease, background-color 0.35s ease;
+  transition: opacity 0.38s ease, background-color 0.38s ease;
   overscroll-behavior: contain;
 }
 
@@ -1222,10 +1252,10 @@ body {
   box-shadow: 0 24px 64px rgba(0,0,0,0.2);
   transform: translateY(20px) scale(0.97);
   transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              background-color 0.35s ease,
-              border-color 0.35s ease,
-              color 0.35s ease,
-              box-shadow 0.35s ease;
+              background-color 0.38s ease,
+              border-color     0.38s ease,
+              color            0.38s ease,
+              box-shadow       0.38s ease;
 }
 
 .modal-overlay.active .modal {
@@ -1277,7 +1307,7 @@ body {
   cursor: pointer;
   font-size: 1.4rem;
   color: var(--text-sec);
-  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease, transform 0.2s ease;
+  transition: background-color 0.38s ease, border-color 0.38s ease, color 0.38s ease, box-shadow 0.38s ease, transform 0.2s ease;
   box-shadow: 0 2px 12px rgba(0,0,0,0.15);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -1304,7 +1334,7 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border);
   margin-bottom: 12px;
-  transition: background-color 0.35s ease, border-color 0.35s ease;
+  transition: background-color 0.38s ease, border-color 0.38s ease;
 }
 
 .gallery-hero-img {
@@ -1315,7 +1345,7 @@ body {
   object-fit: contain;
   display: block;
   background: var(--bg-card);
-  transition: opacity 0.35s ease, background-color 0.35s ease;
+  transition: opacity 0.35s ease, background-color 0.38s ease;
 }
 
 .gallery-hero-img.fade-out {
@@ -1917,18 +1947,19 @@ body {
   /* Nav mobile */
   .nav-menu {
     position: fixed;
-    top: 64px;
+    top: calc(var(--nav-height) + var(--nav-top-space) + env(safe-area-inset-top, 0px));
     left: 0;
     right: 0;
     background: var(--nav-bg);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     flex-direction: column;
     padding: 16px 24px;
     gap: 4px;
     transform: translateY(-120%);
     opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.35s ease, border-color 0.35s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.38s ease, border-color 0.38s ease;
     z-index: 99;
   }
 
