@@ -18,13 +18,17 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <!-- Boxicons CDN -->
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" /></noscript>
 
   <!-- Devicon CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" /></noscript>
+
+  <link rel="preload" as="image" href="assets/profile-optimized.png" fetchpriority="high" />
 
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -109,7 +113,15 @@
           <div class="photo-blob photo-blob--1"></div>
           <div class="photo-blob photo-blob--2"></div>
           <div class="photo-wrapper">
-            <img src="assets/profile.png" alt="Foto Pahruroji" class="profile-img" />
+            <img
+              src="assets/profile-optimized.png"
+              alt="Foto Pahruroji"
+              class="profile-img"
+              width="900"
+              height="897"
+              decoding="async"
+              fetchpriority="high"
+            />
             <div class="photo-fade"></div>
           </div>
         </div>
@@ -272,7 +284,7 @@
         <!-- Project 1: Login Page -->
         <div class="project-card reveal-up" data-modal="modal-3" style="--reveal-delay: 0.1s">
           <div class="project-thumb">
-            <img src="assets/login_preview.png" alt="Login Page Preview" class="project-thumb-img" loading="lazy" style="object-position: top;" />
+            <img src="assets/thumbs/login_preview.jpg" alt="Login Page Preview" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="370" style="object-position: top;" />
             <div class="project-overlay">
               <button class="btn btn-primary btn-sm open-modal" data-modal="modal-3">Lihat Detail</button>
             </div>
@@ -290,7 +302,7 @@
         <!-- Project 2: Kedai Kopi Remaja Jompo -->
         <div class="project-card reveal-up" data-modal="modal-4" style="--reveal-delay: 0.2s">
           <div class="project-thumb">
-            <img src="assets/kopi_preview.png" alt="Kedai Kopi Remaja Jompo Preview" class="project-thumb-img" loading="lazy" style="object-position: top;" />
+            <img src="assets/thumbs/kopi_preview.jpg" alt="Kedai Kopi Remaja Jompo Preview" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="342" style="object-position: top;" />
             <div class="project-overlay">
               <button class="btn btn-primary btn-sm open-modal" data-modal="modal-4">Lihat Detail</button>
             </div>
@@ -308,7 +320,7 @@
         <!-- Project 3: Web Portofolio -->
         <div class="project-card reveal-up" data-modal="modal-5" style="--reveal-delay: 0.3s">
           <div class="project-thumb">
-            <img src="assets/landingpage_preview.png" alt="Web Portofolio Preview" class="project-thumb-img" loading="lazy" style="object-position: top;" />
+            <img src="assets/thumbs/landingpage_preview.jpg" alt="Web Portofolio Preview" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="329" style="object-position: top;" />
             <div class="project-overlay">
               <button class="btn btn-primary btn-sm open-modal" data-modal="modal-5">Lihat Detail</button>
             </div>
@@ -326,7 +338,7 @@
         <!-- Project 4: EDP NetOps -->
         <div class="project-card reveal-up" data-modal="modal-1" style="--reveal-delay: 0.4s">
           <div class="project-thumb">
-            <img src="assets/EDP NetOps/1_Dashboard.jpeg" alt="EDP NetOps Dashboard" class="project-thumb-img" loading="lazy" style="object-position: top;" />
+            <img src="assets/thumbs/edp_dashboard.jpg" alt="EDP NetOps Dashboard" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="430" style="object-position: top;" />
             <div class="project-overlay">
               <button class="btn btn-primary btn-sm open-modal" data-modal="modal-1">Lihat Detail</button>
             </div>
@@ -344,7 +356,7 @@
         <!-- Project 5: Bot Tambah MAC -->
         <div class="project-card reveal-up" data-modal="modal-2" style="--reveal-delay: 0.5s">
           <div class="project-thumb">
-            <img src="assets/Bot Tele/BotTambahMac.png" alt="Bot Tambah MAC" class="project-thumb-img" loading="lazy" style="object-position: top;" />
+            <img src="assets/thumbs/bot_tambah_mac.jpg" alt="Bot Tambah MAC" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="576" style="object-position: top;" />
             <div class="project-overlay">
               <button class="btn btn-primary btn-sm open-modal" data-modal="modal-2">Lihat Detail</button>
             </div>
@@ -477,6 +489,10 @@
             alt="Form Login EDP NetOps"
             class="gallery-hero-img"
             id="gallery-hero-1"
+            width="1306"
+            height="791"
+            loading="lazy"
+            decoding="async"
           />
           <div class="gallery-hero-caption" id="gallery-caption-1">Form Login</div>
           <!-- Navigation Arrows -->
@@ -492,34 +508,34 @@
         <div class="gallery-thumbnails-scroll">
           <div class="gallery-thumbnails" id="gallery-thumbs-1">
             <button class="gallery-thumb active" data-src="assets/EDP NetOps/FormLogin.png" data-alt="Form Login EDP NetOps" data-caption="Form Login">
-              <img src="assets/EDP NetOps/FormLogin.png" alt="Form Login" loading="lazy" />
+              <img src="assets/EDP NetOps/FormLogin.png" alt="Form Login" loading="lazy" decoding="async" width="1306" height="791" />
             </button>
             <button class="gallery-thumb" data-src="assets/EDP NetOps/1_Dashboard.jpeg" data-alt="Dashboard EDP NetOps" data-caption="Dashboard">
-              <img src="assets/EDP NetOps/1_Dashboard.jpeg" alt="Dashboard" loading="lazy" />
+              <img src="assets/EDP NetOps/1_Dashboard.jpeg" alt="Dashboard" loading="lazy" decoding="async" width="1410" height="842" />
             </button>
             <button class="gallery-thumb" data-src="assets/EDP NetOps/2_Dashboard.jpeg" data-alt="Dashboard EDP NetOps 2" data-caption="Dashboard (2)">
-              <img src="assets/EDP NetOps/2_Dashboard.jpeg" alt="Dashboard 2" loading="lazy" />
+              <img src="assets/EDP NetOps/2_Dashboard.jpeg" alt="Dashboard 2" loading="lazy" decoding="async" width="1403" height="841" />
             </button>
             <button class="gallery-thumb" data-src="assets/EDP NetOps/3_ListToko.jpeg" data-alt="List Toko" data-caption="List Toko">
-              <img src="assets/EDP NetOps/3_ListToko.jpeg" alt="List Toko" loading="lazy" />
+              <img src="assets/EDP NetOps/3_ListToko.jpeg" alt="List Toko" loading="lazy" decoding="async" width="1406" height="841" />
             </button>
             <button class="gallery-thumb" data-src="assets/EDP NetOps/4_DetailToko.jpeg" data-alt="Detail Toko" data-caption="Detail Toko">
-              <img src="assets/EDP NetOps/4_DetailToko.jpeg" alt="Detail Toko" loading="lazy" />
+              <img src="assets/EDP NetOps/4_DetailToko.jpeg" alt="Detail Toko" loading="lazy" decoding="async" width="1411" height="843" />
             </button>
             <button class="gallery-thumb" data-src="assets/EDP NetOps/5_DetailToko.jpeg" data-alt="Detail Toko 2" data-caption="Detail Toko (2)">
-              <img src="assets/EDP NetOps/5_DetailToko.jpeg" alt="Detail Toko 2" loading="lazy" />
+              <img src="assets/EDP NetOps/5_DetailToko.jpeg" alt="Detail Toko 2" loading="lazy" decoding="async" width="1408" height="840" />
             </button>
             <button class="gallery-thumb" data-src="assets/EDP NetOps/6_HistoriTicket.jpeg" data-alt="Histori Ticket" data-caption="Histori Ticket">
-              <img src="assets/EDP NetOps/6_HistoriTicket.jpeg" alt="Histori Ticket" loading="lazy" />
+              <img src="assets/EDP NetOps/6_HistoriTicket.jpeg" alt="Histori Ticket" loading="lazy" decoding="async" width="1411" height="841" />
             </button>
             <button class="gallery-thumb" data-src="assets/EDP NetOps/7_HistoriGangguan.jpeg" data-alt="Histori Gangguan" data-caption="Histori Gangguan">
-              <img src="assets/EDP NetOps/7_HistoriGangguan.jpeg" alt="Histori Gangguan" loading="lazy" />
+              <img src="assets/EDP NetOps/7_HistoriGangguan.jpeg" alt="Histori Gangguan" loading="lazy" decoding="async" width="1410" height="839" />
             </button>
             <button class="gallery-thumb" data-src="assets/EDP NetOps/8_PingScanner.jpeg" data-alt="Ping Scanner" data-caption="Ping Scanner">
-              <img src="assets/EDP NetOps/8_PingScanner.jpeg" alt="Ping Scanner" loading="lazy" />
+              <img src="assets/EDP NetOps/8_PingScanner.jpeg" alt="Ping Scanner" loading="lazy" decoding="async" width="1410" height="836" />
             </button>
             <button class="gallery-thumb" data-src="assets/EDP NetOps/9_ScanWdcp.jpeg" data-alt="Scan WDCP" data-caption="Scan WDCP">
-              <img src="assets/EDP NetOps/9_ScanWdcp.jpeg" alt="Scan WDCP" loading="lazy" />
+              <img src="assets/EDP NetOps/9_ScanWdcp.jpeg" alt="Scan WDCP" loading="lazy" decoding="async" width="1409" height="840" />
             </button>
           </div>
         </div>
@@ -685,6 +701,10 @@
             loading="lazy"
             sandbox="allow-scripts allow-same-origin"
           ></iframe>
+          <div class="preview-mobile-fallback">
+            <img src="assets/thumbs/login_preview.jpg" alt="Login Page Preview" loading="lazy" decoding="async" width="720" height="370" />
+            <p>Preview live tersedia melalui tombol demo.</p>
+          </div>
         </div>
         <div class="preview-actions">
           <a href="https://pahruroji12.github.io/Login_page/" class="btn btn-primary btn-sm" target="_blank" rel="noopener">
@@ -764,6 +784,10 @@
             loading="lazy"
             sandbox="allow-scripts allow-same-origin"
           ></iframe>
+          <div class="preview-mobile-fallback">
+            <img src="assets/thumbs/kopi_preview.jpg" alt="Kedai Kopi Remaja Jompo Preview" loading="lazy" decoding="async" width="720" height="342" />
+            <p>Preview live tersedia melalui tombol demo.</p>
+          </div>
         </div>
         <div class="preview-actions">
           <a href="https://remaja-jompo.vercel.app" class="btn btn-primary btn-sm" target="_blank" rel="noopener">
@@ -845,6 +869,9 @@
             alt="Web Portofolio Preview"
             style="width: 100%; height: auto; display: block;"
             loading="lazy"
+            decoding="async"
+            width="1898"
+            height="867"
           />
         </div>
         <div class="preview-actions">

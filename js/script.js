@@ -27,38 +27,56 @@
   document.body.classList.add('preloader-active');
 
   const totalLength = 283; // 2 * Math.PI * 45
-  let currentPercent = 0;
-  
-  // Simulate loading speed
-  const duration = 2200; // 2.2 seconds loading time
-  const intervalTime = 15; // update every 15ms
-  const step = 100 / (duration / intervalTime);
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const displayDuration = prefersReducedMotion ? 450 : 2200;
+  const hardTimeout = prefersReducedMotion ? 700 : 2800;
+  const intervalTime = 100;
+  const startTime = performance.now();
+  let pageReady = document.readyState !== 'loading';
+  let isFinished = false;
 
-  const timer = setInterval(() => {
-    currentPercent += step;
-    if (currentPercent >= 100) {
-      currentPercent = 100;
-      clearInterval(timer);
-      finishLoading();
-    }
+  if (!pageReady) {
+    document.addEventListener('DOMContentLoaded', () => {
+      pageReady = true;
+    }, { once: true });
+  }
 
-    const percentInt = Math.floor(currentPercent);
+  function updateProgress(percent) {
+    const percentInt = Math.min(100, Math.max(0, Math.floor(percent)));
     percentEl.textContent = `${percentInt}%`;
-    
-    // Update SVG circle stroke-dashoffset
+
     const offset = totalLength - (totalLength * percentInt) / 100;
     circleBar.style.strokeDashoffset = offset;
-  }, intervalTime);
+  }
 
   function finishLoading() {
-    setTimeout(() => {
+    if (isFinished) return;
+    isFinished = true;
+    clearInterval(timer);
+    updateProgress(100);
+
+    requestAnimationFrame(() => {
       preloader.classList.add('loaded');
       document.body.classList.remove('preloader-active');
 
-      // Dispatch custom event so home section reveals itself
       document.dispatchEvent(new Event('preloaderComplete'));
-    }, 200); // short delay after reaching 100%
+      setTimeout(() => preloader.remove(), 360);
+    });
   }
+
+  updateProgress(8);
+
+  const timer = setInterval(() => {
+    const elapsed = performance.now() - startTime;
+    const progress = Math.min(elapsed / displayDuration, 1);
+    const easedProgress = 1 - Math.pow(1 - progress, 2);
+
+    updateProgress(Math.min(easedProgress * 100, 99));
+
+    if ((pageReady && elapsed >= displayDuration) || elapsed >= hardTimeout) {
+      finishLoading();
+    }
+  }, intervalTime);
 })();
 
 
@@ -68,11 +86,28 @@
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
 
-  const ctx = canvas.getContext('2d');
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const mobileViewportQuery = window.matchMedia('(max-width: 768px)');
+  const coarsePointerQuery = window.matchMedia('(pointer: coarse)');
+
+  if (reducedMotionQuery.matches || mobileViewportQuery.matches || coarsePointerQuery.matches) {
+    document.body.classList.add('static-bg');
+    canvas.remove();
+    return;
+  }
+
+  canvas.setAttribute('aria-hidden', 'true');
+
+  const ctx = canvas.getContext('2d', { alpha: true });
+  if (!ctx) {
+    document.body.classList.add('static-bg');
+    canvas.remove();
+    return;
+  }
 
   // Detect mobile and preferences
   const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const prefersReduced = reducedMotionQuery.matches;
 
   // Grid spacing: larger spacing means fewer dots and much better performance
   const GRID_SPACE = isMobile ? 26 : 20; 
@@ -265,7 +300,19 @@
     buildGrid();
   }
 
+  function stopDrawing() {
+    if (animId) {
+      cancelAnimationFrame(animId);
+      animId = null;
+    }
+  }
+
   function draw(timestamp) {
+    if (document.hidden) {
+      animId = null;
+      return;
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Smoothly interpolate colors frame-by-frame
@@ -542,9 +589,22 @@
 
   // Resize
   window.addEventListener('resize', () => {
-    cancelAnimationFrame(animId);
+    stopDrawing();
     resize();
     draw();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopDrawing();
+      clearTimeout(idleTimer);
+      return;
+    }
+
+    if (!animId) {
+      resize();
+      draw();
+    }
   });
 
   // Theme change
@@ -640,13 +700,82 @@
 // 5. SMOOTH SCROLL & ACTIVE NAV LINK (SCROLL SPY)
 
 (function initNavigation() {
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = Array.from(document.querySelectorAll('section[id]'));
+  const navLinks = Array.from(document.querySelectorAll('.nav-link'));
   const anchorLinks = document.querySelectorAll('a[href^="#"]:not([href="#"])');
   const navbar   = document.getElementById('navbar');
+  const scrollTopBtn = document.getElementById('scroll-top');
   
   let isScrolling = false;
   let scrollTimeout = null;
+  let ticking = false;
+  let sectionMetrics = [];
+  let triggerOffset = 74;
+  let currentActiveId = '';
+
+  function refreshScrollMetrics() {
+    const navbarHeight = navbar ? navbar.offsetHeight : 64;
+    const topSpace = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-top-space')) || 0;
+    triggerOffset = navbarHeight - 16 + topSpace + 10;
+
+    sectionMetrics = sections.map(sec => {
+      const top = sec.offsetTop;
+      return {
+        id: sec.getAttribute('id'),
+        top,
+        bottom: top + sec.offsetHeight,
+      };
+    });
+  }
+
+  function updateActiveNav(activeId) {
+    if (!activeId || activeId === currentActiveId) return;
+
+    currentActiveId = activeId;
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`);
+    });
+  }
+
+  function runScrollUpdates() {
+    ticking = false;
+
+    const scrollY = window.scrollY;
+
+    if (scrollTopBtn) {
+      scrollTopBtn.classList.toggle('visible', scrollY > 400);
+    }
+
+    if (isScrolling) return;
+
+    const triggerLine = scrollY + triggerOffset;
+    let activeId = '';
+
+    for (const sec of sectionMetrics) {
+      if (triggerLine >= sec.top && triggerLine < sec.bottom) {
+        activeId = sec.id;
+        break;
+      }
+    }
+
+    if (scrollY < 50) {
+      activeId = 'home';
+    }
+
+    const isAtBottom = (window.innerHeight + scrollY) >= (document.documentElement.scrollHeight - 20);
+    if (isAtBottom && sectionMetrics.length > 0) {
+      activeId = sectionMetrics[sectionMetrics.length - 1].id;
+    }
+
+    updateActiveNav(activeId);
+  }
+
+  function requestScrollUpdate() {
+    if (ticking) return;
+
+    window.requestAnimationFrame(runScrollUpdates);
+    ticking = true;
+  }
 
   // 1. Custom Smooth Scroll on Link Click
   anchorLinks.forEach(link => {
@@ -701,65 +830,24 @@
       // Reset scroll flag after smooth scroll ends (800ms)
       scrollTimeout = setTimeout(() => {
         isScrolling = false;
+        refreshScrollMetrics();
+        requestScrollUpdate();
       }, 800);
     });
   });
 
-  // 2. Scroll Spy logic
-  function onScroll() {
-    if (isScrolling) return; // Skip updating during programmatic scroll
-
-    const navbarHeight = navbar ? navbar.offsetHeight : 64;
-    const topSpace = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-top-space')) || 0;
-    
-    // extraOffset is the offset used to match trigger line
-    const extraOffset = -16 + topSpace + 10; // Extra 10px buffer for sub-pixel calculation
-    const triggerLine = window.scrollY + navbarHeight + extraOffset;
-
-    let activeId = '';
-
-    sections.forEach(sec => {
-      const top = sec.offsetTop;
-      const height = sec.offsetHeight;
-      const id = sec.getAttribute('id');
-      
-      // If the trigger line is past the top of the section and has not left the section
-      if (triggerLine >= top && triggerLine < top + height) {
-        activeId = id;
-      }
-    });
-
-    // Special case: at the very top of the page, force Home to be active
-    if (window.scrollY < 50) {
-      activeId = 'home';
-    }
-
-    // Special case: at the very bottom of the page, force last section (Contact) to be active
-    const isAtBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 20);
-    if (isAtBottom && sections.length > 0) {
-      activeId = sections[sections.length - 1].getAttribute('id');
-    }
-
-    if (activeId) {
-      navLinks.forEach(l => {
-        l.classList.toggle('active', l.getAttribute('href') === `#${activeId}`);
-      });
-    }
-  }
-
-  // Optimize scroll performance with requestAnimationFrame
-  let ticking = false;
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        onScroll();
-        ticking = false;
-      });
-      ticking = true;
-    }
+  window.addEventListener('scroll', requestScrollUpdate, { passive: true });
+  window.addEventListener('resize', () => {
+    refreshScrollMetrics();
+    requestScrollUpdate();
   }, { passive: true });
+  window.addEventListener('load', () => {
+    refreshScrollMetrics();
+    requestScrollUpdate();
+  }, { once: true });
 
-  onScroll();
+  refreshScrollMetrics();
+  requestScrollUpdate();
 })();
 
 //6. TYPING EFFECT
@@ -893,6 +981,29 @@
   const openBtns  = document.querySelectorAll('.open-modal');
   const overlays  = document.querySelectorAll('.modal-overlay');
   const closeBtns = document.querySelectorAll('.modal-close');
+  const livePreviewQuery = window.matchMedia('(min-width: 769px) and (hover: hover) and (pointer: fine)');
+
+  function canLoadLivePreview() {
+    return livePreviewQuery.matches;
+  }
+
+  function unloadPreviewIframes(root = document) {
+    root.querySelectorAll('iframe[data-src]').forEach(iframe => {
+      iframe.src = '';
+    });
+  }
+
+  function handlePreviewModeChange(e) {
+    if (!e.matches) {
+      unloadPreviewIframes();
+    }
+  }
+
+  if (livePreviewQuery.addEventListener) {
+    livePreviewQuery.addEventListener('change', handlePreviewModeChange);
+  } else if (livePreviewQuery.addListener) {
+    livePreviewQuery.addListener(handlePreviewModeChange);
+  }
 
   function openModal(id) {
     const el = document.getElementById(id);
@@ -903,7 +1014,7 @@
       // Load iframe if present (lazy loading preview)
       const iframe = el.querySelector('iframe[data-src]');
       if (iframe) {
-        iframe.src = iframe.dataset.src;
+        iframe.src = canLoadLivePreview() ? iframe.dataset.src : '';
       }
     }
   }
@@ -915,10 +1026,7 @@
       document.body.style.overflow = '';
 
       // Unload iframe if present (to release resources)
-      const iframe = el.querySelector('iframe[data-src]');
-      if (iframe) {
-        iframe.src = '';
-      }
+      unloadPreviewIframes(el);
 
       // Pause and reset video if present
       const video = el.querySelector('video');
@@ -1184,10 +1292,6 @@
 (function initScrollTop() {
   const btn = document.getElementById('scroll-top');
   if (!btn) return;
-
-  window.addEventListener('scroll', () => {
-    btn.classList.toggle('visible', window.scrollY > 400);
-  }, { passive: true });
 
   btn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });

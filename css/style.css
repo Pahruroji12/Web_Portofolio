@@ -144,7 +144,7 @@ html.theme-changing * {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1), opacity 0.8s ease;
+  transition: transform 0.28s cubic-bezier(0.85, 0, 0.15, 1), opacity 0.28s ease;
 }
 
 #preloader.loaded {
@@ -168,7 +168,7 @@ body.preloader-active {
   justify-content: center;
   align-items: center;
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -177,7 +177,7 @@ body.preloader-active {
 .preloader-text-loader span {
   color: var(--text-main);
   opacity: 0;
-  animation: preloader-pass 2s ease-in-out infinite;
+  animation: preloader-pass 1.8s ease-in-out infinite;
   animation-delay: var(--delay);
 }
 
@@ -249,6 +249,27 @@ body.preloader-active {
   pointer-events: none;
 }
 
+body.static-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--dot-static) 1px, transparent 1px);
+  background-size: 26px 26px;
+  opacity: 0.65;
+}
+
+[data-theme="dark"] body.static-bg::before {
+  opacity: 0.42;
+}
+
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+  #bg-canvas {
+    display: none;
+  }
+}
+
 /* LAYOUT UTILITIES */
 
 .section {
@@ -266,7 +287,7 @@ body.preloader-active {
 
 .section-title {
   font-size: clamp(1.8rem, 4vw, 2.5rem);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text-main);
   margin-bottom: 48px;
@@ -319,7 +340,7 @@ body.preloader-active {
 
 .nav-logo {
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-main);
   text-decoration: none;
   letter-spacing: -0.02em;
@@ -336,7 +357,7 @@ body.preloader-active {
 .nav-link {
   text-decoration: none;
   color: var(--text-sec);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.9rem;
   padding: 6px 12px;
   border-radius: 8px;
@@ -492,7 +513,7 @@ body.preloader-active {
 
 .home-name {
   font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.1;
   color: var(--text-main);
@@ -504,7 +525,7 @@ body.preloader-active {
   color: var(--text-sec);
   margin-bottom: 20px;
   min-height: 1.8em;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .role-static {
@@ -518,7 +539,7 @@ body.preloader-active {
 
 .typing-cursor {
   color: var(--accent);
-  font-weight: 300;
+  font-weight: 400;
   animation: blink 0.8s infinite;
 }
 
@@ -633,6 +654,7 @@ body.preloader-active {
 .profile-img {
   width: 100%;
   height: auto;
+  aspect-ratio: 900 / 897;
   display: block;
   filter:
     drop-shadow(0 8px 32px rgba(0, 0, 0, 0.15))
@@ -794,7 +816,7 @@ body.preloader-active {
   padding: 8px 18px;
   font-size: 0.85rem;
   border-radius: 8px;
-  font-weight: 500;
+  font-weight: 600;
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
               background-color 0.38s ease, 
               color 0.38s ease,
@@ -878,7 +900,7 @@ body.preloader-active {
   padding: 8px 16px;
   border-radius: 30px;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-sec);
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
               background-color 0.38s ease,
@@ -1389,7 +1411,7 @@ body.preloader-active {
 
 .footer-logo {
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-main);
   text-decoration: none;
   letter-spacing: -0.02em;
@@ -1416,7 +1438,7 @@ body.preloader-active {
   text-decoration: none;
   color: var(--text-sec);
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   padding: 6px 14px;
   border-radius: 8px;
   transition: color 0.35s ease;
@@ -2159,6 +2181,33 @@ body.preloader-active {
   background: #fff;
 }
 
+.preview-mobile-fallback {
+  display: none;
+}
+
+.preview-mobile-fallback img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+
+.preview-mobile-fallback p {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.82);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 .preview-actions {
   display: flex;
   gap: 12px;
@@ -2330,15 +2379,97 @@ body.preloader-active {
 /*  RESPONSIVE — Mobile  */
 
 @media (max-width: 768px) {
+  :root {
+    --shadow: 0 2px 10px rgba(0,0,0,0.06);
+    --shadow-hover: 0 4px 14px rgba(0,0,0,0.10);
+    --accent-glow: rgba(37, 99, 235, 0.08);
+  }
+
+  [data-theme="dark"] {
+    --shadow: 0 2px 10px rgba(0,0,0,0.28);
+    --shadow-hover: 0 4px 16px rgba(0,0,0,0.36);
+    --accent-glow: rgba(59, 130, 246, 0.12);
+  }
+
+  .navbar,
+  .nav-menu,
+  .modal-overlay,
+  .modal-close,
+  .modal--gallery .modal-close,
+  .modal--video .modal-close,
+  .modal--preview .modal-close,
+  .gallery-counter,
+  .gallery-nav,
+  .lightbox-nav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .navbar,
+  .nav-menu {
+    background: var(--bg);
+  }
+
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.48);
+  }
+
+  [data-theme="dark"] .modal-overlay {
+    background: rgba(0, 0, 0, 0.72);
+  }
+
+  .photo-blob {
+    filter: none;
+    animation: none;
+  }
+
+  .profile-img {
+    filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.14));
+  }
+
+  .about-card,
+  .about-highlight-card,
+  .skill-card,
+  .project-card,
+  .contact-info-card,
+  .contact-form-card,
+  .toast {
+    box-shadow: var(--shadow);
+  }
+
+  .modal {
+    width: min(100%, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+    overflow-x: hidden;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    transform: translateY(8px);
+  }
+
+  .modal-overlay.active .modal {
+    transform: translateY(0);
+  }
+
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-up {
+    transition-duration: 0.45s;
+    will-change: auto;
+  }
+
+  .preview-wrap,
+  .video-wrap,
+  .lightbox-img {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  }
+
   /* Nav mobile */
   .nav-menu {
     position: fixed;
     top: calc(var(--nav-height) + var(--nav-top-space) + env(safe-area-inset-top, 0px));
     left: 0;
     right: 0;
-    background: var(--nav-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: var(--bg);
     border-bottom: 1px solid var(--border);
     flex-direction: column;
     padding: 16px 24px;
@@ -2541,9 +2672,14 @@ body.preloader-active {
   }
 
   .preview-iframe {
-    width: 200%;
-    height: 200%;
-    transform: scale(0.5);
+    display: none;
+  }
+
+  .preview-mobile-fallback {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: var(--bg-card);
   }
 
   .preview-demo-wrapper {
@@ -2726,6 +2862,70 @@ body.preloader-active {
     right: 20px;
     width: 42px;
     height: 42px;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .btn:hover,
+  .theme-toggle:hover,
+  .hamburger:hover,
+  .tag:hover,
+  .skill-pill:hover,
+  .footer-social:hover,
+  .scroll-top:hover,
+  .modal-github-link:hover,
+  .lightbox-close:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .about-highlight-card:hover,
+  .about-card:hover,
+  .skill-card:hover,
+  .project-card:hover,
+  .contact-info-card:hover {
+    transform: none !important;
+    border-color: var(--border);
+    box-shadow: var(--shadow) !important;
+  }
+
+  .photo-wrapper:hover .profile-img,
+  .project-card:hover .project-thumb-img,
+  .about-highlight-card:hover .highlight-icon,
+  .about-card:hover .about-icon i,
+  .skill-pill:hover i,
+  .skill-pill:hover svg,
+  .skill-pill:hover .skill-icon-svg {
+    transform: none !important;
+  }
+
+  .photo-wrapper:hover .profile-img {
+    filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.14));
+  }
+
+  .gallery-nav:hover,
+  .gallery-nav:active,
+  .lightbox-nav:hover,
+  .lightbox-nav:active {
+    transform: translateY(-50%) !important;
+    box-shadow: none !important;
+  }
+
+  .gallery-thumb:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .project-overlay {
+    opacity: 1;
+    align-items: flex-end;
+    padding: 12px;
+    background: linear-gradient(to top, rgba(17, 24, 39, 0.72), rgba(17, 24, 39, 0));
+  }
+
+  .project-overlay .btn {
+    padding: 7px 14px;
+    font-size: 0.78rem;
   }
 }
 
