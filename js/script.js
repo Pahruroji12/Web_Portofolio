@@ -1121,12 +1121,18 @@
     if (preloader) {
       document.addEventListener("preloaderComplete", () => {
         setTimeout(() => {
-          homeReveals.forEach((el) => el.classList.add("revealed"));
+          homeReveals.forEach((el) => {
+            el.classList.add("revealed");
+            observer.observe(el);
+          });
         }, 150);
-      });
+      }, { once: true });
     } else {
       setTimeout(() => {
-        homeReveals.forEach((el) => el.classList.add("revealed"));
+        homeReveals.forEach((el) => {
+          el.classList.add("revealed");
+          observer.observe(el);
+        });
       }, 150);
     }
   }
@@ -1135,15 +1141,23 @@
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("revealed");
-          observer.unobserve(entry.target); // animate only once
+        const element = entry.target;
+
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.12) {
+          element.classList.add("revealed");
+          return;
+        }
+
+        if (!entry.isIntersecting) {
+          const exitedAbove = entry.boundingClientRect.bottom <= 0;
+          element.classList.toggle("reveal-from-top", exitedAbove);
+          element.classList.remove("revealed");
         }
       });
     },
     {
-      threshold: 0.12, // trigger when 12% of element is visible
-      rootMargin: "0px 0px -40px 0px", // slight offset from bottom edge
+      threshold: [0, 0.12],
+      rootMargin: "0px 0px -40px 0px",
     },
   );
 

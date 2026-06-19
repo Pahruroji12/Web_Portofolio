@@ -2453,6 +2453,13 @@ body.static-bg::before {
 }
 
 /* Revealed state — applied by IntersectionObserver */
+.reveal.reveal-from-top,
+.reveal-left.reveal-from-top,
+.reveal-right.reveal-from-top,
+.reveal-up.reveal-from-top {
+  transform: translateY(-28px);
+}
+
 .reveal.revealed,
 .reveal-left.revealed,
 .reveal-right.revealed,
