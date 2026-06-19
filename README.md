@@ -19,7 +19,3 @@ Website portofolio pribadi Pahruroji yang menampilkan profil, keahlian, pengalam
 - Live preview project khusus desktop
 - Tampilan responsif untuk desktop dan mobile
 - Form kontak demo serta tautan email dan WhatsApp
-
-## Menjalankan Project
-
-Buka file `index.html` melalui browser. Project ini tidak memerlukan proses instalasi atau build.
