@@ -1,43 +1,29 @@
-/* 
-   PORTFOLIO PAHRUROJI — script.js
-   Includes:
-   - Preloader System
-   - Interactive Dot Matrix Grid (canvas)
-   - Dark / Light Mode + localStorage
-   - Navbar & Hamburger Menu
-   - Smooth Scroll & Active Nav Link (Scroll Spy)
-   - Typing Effect
-   - Scroll Reveal (IntersectionObserver)
-   - Project Modal Controller
-   - Gallery Slider System
-   - Video & Iframe Lifecycle
-   - Contact Form Validation & Demo Notice
-   - Scroll to Top
-   - Fullscreen Lightbox Image Preview
-   */
-
-// 1. PRELOADER SYSTEM 
+// 1. PRELOADER SYSTEM
 
 (function initPreloader() {
-  const preloader = document.getElementById('preloader');
-  const percentEl = document.getElementById('preloader-percent');
-  const circleBar = document.getElementById('preloader-circle-bar');
+  const preloader = document.getElementById("preloader");
+  const percentEl = document.getElementById("preloader-percent");
+  const circleBar = document.getElementById("preloader-circle-bar");
   if (!preloader || !percentEl || !circleBar) return;
 
-  document.body.classList.add('preloader-active');
+  document.body.classList.add("preloader-active");
 
   const totalLength = 283; // 2 * Math.PI * 45
   const displayDuration = 2200;
   const hardTimeout = 2800;
   const intervalTime = 100;
   const startTime = performance.now();
-  let pageReady = document.readyState !== 'loading';
+  let pageReady = document.readyState !== "loading";
   let isFinished = false;
 
   if (!pageReady) {
-    document.addEventListener('DOMContentLoaded', () => {
-      pageReady = true;
-    }, { once: true });
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+        pageReady = true;
+      },
+      { once: true },
+    );
   }
 
   function updateProgress(percent) {
@@ -55,10 +41,10 @@
     updateProgress(100);
 
     requestAnimationFrame(() => {
-      preloader.classList.add('loaded');
-      document.body.classList.remove('preloader-active');
+      preloader.classList.add("loaded");
+      document.body.classList.remove("preloader-active");
 
-      document.dispatchEvent(new Event('preloaderComplete'));
+      document.dispatchEvent(new Event("preloaderComplete"));
       setTimeout(() => preloader.remove(), 360);
     });
   }
@@ -78,28 +64,33 @@
   }, intervalTime);
 })();
 
-
 // 2. INTERACTIVE DOT MATRIX GRID (CANVAS)
 
 (function initCanvas() {
-  const canvas = document.getElementById('bg-canvas');
+  const canvas = document.getElementById("bg-canvas");
   if (!canvas) return;
 
-  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const mobileViewportQuery = window.matchMedia('(max-width: 768px)');
-  const coarsePointerQuery = window.matchMedia('(pointer: coarse)');
+  const reducedMotionQuery = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  );
+  const mobileViewportQuery = window.matchMedia("(max-width: 768px)");
+  const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
 
-  if (reducedMotionQuery.matches || mobileViewportQuery.matches || coarsePointerQuery.matches) {
-    document.body.classList.add('static-bg');
+  if (
+    reducedMotionQuery.matches ||
+    mobileViewportQuery.matches ||
+    coarsePointerQuery.matches
+  ) {
+    document.body.classList.add("static-bg");
     canvas.remove();
     return;
   }
 
-  canvas.setAttribute('aria-hidden', 'true');
+  canvas.setAttribute("aria-hidden", "true");
 
-  const ctx = canvas.getContext('2d', { alpha: true });
+  const ctx = canvas.getContext("2d", { alpha: true });
   if (!ctx) {
-    document.body.classList.add('static-bg');
+    document.body.classList.add("static-bg");
     canvas.remove();
     return;
   }
@@ -119,56 +110,116 @@
   const IDLE_FRAME_INTERVAL = 1000 / (isLowEndDevice ? 8 : 24);
 
   // Idle fade settings
-  const IDLE_TIMEOUT   = 1800;
+  const IDLE_TIMEOUT = 1800;
   const OPACITY_ACTIVE = 1.0;
-  const OPACITY_IDLE   = 0.35; // Raised slightly so dots stay visible when idle
-  const FADE_SPEED     = 0.02; // Smoother transition
+  const OPACITY_IDLE = 0.35; // Raised slightly so dots stay visible when idle
+  const FADE_SPEED = 0.02; // Smoother transition
 
   const TIERS = isLowEndDevice
     ? [
-        { name: 'far', chance: 0.012, dotBase: 0.4, dotMax: 0.7, twinkleMax: 0.22, driftAmp: 0.25, driftSpeed: 0.00015, glowSize: 0, flareChance: 0 },
-        { name: 'mid', chance: 0.006, dotBase: 0.6, dotMax: 1.0, twinkleMax: 0.3, driftAmp: 0.45, driftSpeed: 0.00025, glowSize: 0, flareChance: 0 },
-        { name: 'near', chance: 0.002, dotBase: 0.8, dotMax: 1.3, twinkleMax: 0.4, driftAmp: 0.7, driftSpeed: 0.00035, glowSize: 0, flareChance: 0 },
+        {
+          name: "far",
+          chance: 0.012,
+          dotBase: 0.4,
+          dotMax: 0.7,
+          twinkleMax: 0.22,
+          driftAmp: 0.25,
+          driftSpeed: 0.00015,
+          glowSize: 0,
+          flareChance: 0,
+        },
+        {
+          name: "mid",
+          chance: 0.006,
+          dotBase: 0.6,
+          dotMax: 1.0,
+          twinkleMax: 0.3,
+          driftAmp: 0.45,
+          driftSpeed: 0.00025,
+          glowSize: 0,
+          flareChance: 0,
+        },
+        {
+          name: "near",
+          chance: 0.002,
+          dotBase: 0.8,
+          dotMax: 1.3,
+          twinkleMax: 0.4,
+          driftAmp: 0.7,
+          driftSpeed: 0.00035,
+          glowSize: 0,
+          flareChance: 0,
+        },
       ]
     : [
-        { name: 'far', chance: 0.03, dotBase: 0.4, dotMax: 0.8, twinkleMax: 0.3, driftAmp: 0.4, driftSpeed: 0.0002, glowSize: 0, flareChance: 0 },
-        { name: 'mid', chance: 0.02, dotBase: 0.6, dotMax: 1.2, twinkleMax: 0.5, driftAmp: 0.8, driftSpeed: 0.0004, glowSize: 3, flareChance: 0 },
-        { name: 'near', chance: 0.01, dotBase: 0.8, dotMax: 1.6, twinkleMax: 0.65, driftAmp: 1.4, driftSpeed: 0.0006, glowSize: 5, flareChance: 0.1 },
+        {
+          name: "far",
+          chance: 0.03,
+          dotBase: 0.4,
+          dotMax: 0.8,
+          twinkleMax: 0.3,
+          driftAmp: 0.4,
+          driftSpeed: 0.0002,
+          glowSize: 0,
+          flareChance: 0,
+        },
+        {
+          name: "mid",
+          chance: 0.02,
+          dotBase: 0.6,
+          dotMax: 1.2,
+          twinkleMax: 0.5,
+          driftAmp: 0.8,
+          driftSpeed: 0.0004,
+          glowSize: 3,
+          flareChance: 0,
+        },
+        {
+          name: "near",
+          chance: 0.01,
+          dotBase: 0.8,
+          dotMax: 1.6,
+          twinkleMax: 0.65,
+          driftAmp: 1.4,
+          driftSpeed: 0.0006,
+          glowSize: 5,
+          flareChance: 0.1,
+        },
       ];
   const TOTAL_TWINKLE_CHANCE = TIERS.reduce((s, t) => s + t.chance, 0);
 
   const PLAIN_DOT_BASE = 0.5;
-  const PLAIN_DOT_MAX  = 1.2;
+  const PLAIN_DOT_MAX = 1.2;
 
   // Twinkle wave speeds (dual sine)
   const WAVE_SPEED_A_MIN = 0.0008;
-  const WAVE_SPEED_A_MAX = 0.0020;
+  const WAVE_SPEED_A_MAX = 0.002;
   const WAVE_SPEED_B_MIN = 0.0004;
-  const WAVE_SPEED_B_MAX = 0.0010;
+  const WAVE_SPEED_B_MAX = 0.001;
 
   // Cursor ambient glow settings
   const CURSOR_GLOW_RADIUS = isLowEndDevice ? 140 : 180;
-  const CURSOR_GLOW_ALPHA  = 0.08;
+  const CURSOR_GLOW_ALPHA = 0.08;
 
   let mouse = { x: -9999, y: -9999 };
   let smoothMouse = { x: -9999, y: -9999 };
-  let dots  = [];
+  let dots = [];
   let animId;
   let lastFrameTime = 0;
-  let theme = document.documentElement.getAttribute('data-theme') || 'light';
+  let theme = document.documentElement.getAttribute("data-theme") || "light";
 
   // State variables for smooth canvas color transitions
   let targetColors = getColors();
   let currentStaticColor = hexToRgb(targetColors.static);
   let currentCursorColor = hexToRgb(targetColors.cursor);
   let currentTwinkleColors = {
-    far: getTwinkleColor('far'),
-    mid: getTwinkleColor('mid'),
-    near: getTwinkleColor('near')
+    far: getTwinkleColor("far"),
+    mid: getTwinkleColor("mid"),
+    near: getTwinkleColor("near"),
   };
 
-  let idleTimer    = null;
-  let isIdle       = true;
+  let idleTimer = null;
+  let isIdle = true;
   let globalOpacity = OPACITY_IDLE;
 
   const ENABLE_SPARKS = !isLowEndDevice;
@@ -186,25 +237,31 @@
 
   // Define static dot color and cursor highlight color
   function getColors() {
-    if (theme === 'dark') {
-      return { static: '#1F2226', cursor: '#3B82F6' }; // Accent blue in dark mode
+    if (theme === "dark") {
+      return { static: "#1F2226", cursor: "#3B82F6" }; // Accent blue in dark mode
     }
-    return { static: '#E5E7EB', cursor: '#2563EB' }; // Accent blue in light mode
+    return { static: "#E5E7EB", cursor: "#2563EB" }; // Accent blue in light mode
   }
 
   // Twinkle star colors (following blue accent theme)
   function getTwinkleColor(tierName) {
-    if (theme === 'dark') {
+    if (theme === "dark") {
       switch (tierName) {
-        case 'far':  return { r: 120, g: 150, b: 220 }; // Soft ice blue
-        case 'mid':  return { r: 150, g: 180, b: 255 }; // Bright blue-white
-        case 'near': return { r: 210, g: 225, b: 255 }; // Pure star white-blue
+        case "far":
+          return { r: 120, g: 150, b: 220 }; // Soft ice blue
+        case "mid":
+          return { r: 150, g: 180, b: 255 }; // Bright blue-white
+        case "near":
+          return { r: 210, g: 225, b: 255 }; // Pure star white-blue
       }
     }
     switch (tierName) {
-      case 'far':  return { r: 180, g: 200, b: 240 };
-      case 'mid':  return { r: 140, g: 170, b: 230 };
-      case 'near': return { r: 37, g: 99, b: 235 };
+      case "far":
+        return { r: 180, g: 200, b: 240 };
+      case "mid":
+        return { r: 140, g: 170, b: 230 };
+      case "near":
+        return { r: 37, g: 99, b: 235 };
     }
   }
 
@@ -222,42 +279,42 @@
 
   function buildGrid() {
     dots = [];
-    const cols = Math.ceil(canvas.width  / GRID_SPACE) + 1;
+    const cols = Math.ceil(canvas.width / GRID_SPACE) + 1;
     const rows = Math.ceil(canvas.height / GRID_SPACE) + 1;
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const idx  = r * cols + c;
+        const idx = r * cols + c;
         const seed = idx * 7 + r * 13 + c * 31;
-        const rng  = seededRandom(seed);
+        const rng = seededRandom(seed);
 
         // Assign a depth tier for movement/parallax for all dots
         const depthRng = seededRandom(seed + 400);
-        let depth = 0.3;      // Far
+        let depth = 0.3; // Far
         let driftAmp = 0.5;
         let driftSpeed = 0.00025;
 
         if (depthRng > 0.85) {
-          depth = 1.0;        // Near
+          depth = 1.0; // Near
           driftAmp = 1.6;
           driftSpeed = 0.0006;
         } else if (depthRng > 0.55) {
-          depth = 0.6;        // Mid
+          depth = 0.6; // Mid
           driftAmp = 1.0;
           driftSpeed = 0.0004;
         }
 
         const dot = {
-          baseX:   c * GRID_SPACE,
-          baseY:   r * GRID_SPACE,
-          x:       c * GRID_SPACE,
-          y:       r * GRID_SPACE,
-          radius:  PLAIN_DOT_BASE,
+          baseX: c * GRID_SPACE,
+          baseY: r * GRID_SPACE,
+          x: c * GRID_SPACE,
+          y: r * GRID_SPACE,
+          radius: PLAIN_DOT_BASE,
           targetR: PLAIN_DOT_BASE,
-          depth:   depth,
+          depth: depth,
           driftAmp: driftAmp,
           driftSpeed: driftSpeed,
-          seed:    seed,
+          seed: seed,
           twinkle: false,
         };
 
@@ -267,8 +324,8 @@
           for (const tier of TIERS) {
             acc += tier.chance;
             if (rng < acc) {
-              dot.twinkle  = true;
-              dot.tier     = tier;
+              dot.twinkle = true;
+              dot.tier = tier;
 
               const rng2 = seededRandom(seed + 999);
               const rng3 = seededRandom(seed + 1777);
@@ -279,20 +336,23 @@
               // Dual sine wave parameters
               dot.phaseA = rng2 * Math.PI * 2;
               dot.phaseB = rng5 * Math.PI * 2;
-              dot.speedA = WAVE_SPEED_A_MIN + rng3 * (WAVE_SPEED_A_MAX - WAVE_SPEED_A_MIN);
-              dot.speedB = WAVE_SPEED_B_MIN + rng6 * (WAVE_SPEED_B_MAX - WAVE_SPEED_B_MIN);
+              dot.speedA =
+                WAVE_SPEED_A_MIN + rng3 * (WAVE_SPEED_A_MAX - WAVE_SPEED_A_MIN);
+              dot.speedB =
+                WAVE_SPEED_B_MIN + rng6 * (WAVE_SPEED_B_MAX - WAVE_SPEED_B_MIN);
               dot.twinkleMax = 0.15 + rng4 * (tier.twinkleMax - 0.15);
 
               // Drift parameters
               dot.driftPhaseX = rng2 * Math.PI * 2;
               dot.driftPhaseY = rng3 * Math.PI * 2;
-              dot.driftAmp    = tier.driftAmp;
-              dot.driftSpeed  = tier.driftSpeed * (0.8 + rng4 * 0.4);
+              dot.driftAmp = tier.driftAmp;
+              dot.driftSpeed = tier.driftSpeed * (0.8 + rng4 * 0.4);
 
               // Flare parameters (extremely rare, only near dots, disabled on mobile)
-              dot.canFlare    = !isMobile && tier.flareChance > 0 && rng4 < tier.flareChance;
-              dot.flarePhase  = rng5 * Math.PI * 2;
-              dot.flareSpeed  = 0.0002 + rng6 * 0.0003;
+              dot.canFlare =
+                !isMobile && tier.flareChance > 0 && rng4 < tier.flareChance;
+              dot.flarePhase = rng5 * Math.PI * 2;
+              dot.flareSpeed = 0.0002 + rng6 * 0.0003;
 
               break;
             }
@@ -305,7 +365,7 @@
   }
 
   function resize() {
-    canvas.width  = window.innerWidth;
+    canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     buildGrid();
   }
@@ -332,7 +392,7 @@
     lastFrameTime = frameTime;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Smoothly interpolate colors frame-by-frame
     const colors = getColors();
     const targetStaticRGB = hexToRgb(colors.static);
@@ -346,17 +406,29 @@
     currentCursorColor.g = lerp(currentCursorColor.g, targetCursorRGB.g, 0.08);
     currentCursorColor.b = lerp(currentCursorColor.b, targetCursorRGB.b, 0.08);
 
-    for (const key of ['far', 'mid', 'near']) {
+    for (const key of ["far", "mid", "near"]) {
       const targetT = getTwinkleColor(key);
-      currentTwinkleColors[key].r = lerp(currentTwinkleColors[key].r, targetT.r, 0.08);
-      currentTwinkleColors[key].g = lerp(currentTwinkleColors[key].g, targetT.g, 0.08);
-      currentTwinkleColors[key].b = lerp(currentTwinkleColors[key].b, targetT.b, 0.08);
+      currentTwinkleColors[key].r = lerp(
+        currentTwinkleColors[key].r,
+        targetT.r,
+        0.08,
+      );
+      currentTwinkleColors[key].g = lerp(
+        currentTwinkleColors[key].g,
+        targetT.g,
+        0.08,
+      );
+      currentTwinkleColors[key].b = lerp(
+        currentTwinkleColors[key].b,
+        targetT.b,
+        0.08,
+      );
     }
 
     const staticC = currentStaticColor;
     const cursorC = currentCursorColor;
-    const now     = frameTime;
-    const isDark  = theme === 'dark';
+    const now = frameTime;
+    const isDark = theme === "dark";
 
     // Smooth global opacity
     const targetOpacity = isIdle ? OPACITY_IDLE : OPACITY_ACTIVE;
@@ -373,36 +445,59 @@
         sparks.push({
           dot: randDot,
           start: now,
-          duration: SPARK_DURATION[0] + Math.random() * (SPARK_DURATION[1] - SPARK_DURATION[0]),
+          duration:
+            SPARK_DURATION[0] +
+            Math.random() * (SPARK_DURATION[1] - SPARK_DURATION[0]),
           len: SPARK_LEN[0] + Math.random() * (SPARK_LEN[1] - SPARK_LEN[0]),
-          axis: Math.random() < 0.5 ? 'h' : 'v',
+          axis: Math.random() < 0.5 ? "h" : "v",
         });
       }
-      nextSparkAt = now + SPARK_INTERVAL[0] + Math.random() * (SPARK_INTERVAL[1] - SPARK_INTERVAL[0]);
+      nextSparkAt =
+        now +
+        SPARK_INTERVAL[0] +
+        Math.random() * (SPARK_INTERVAL[1] - SPARK_INTERVAL[0]);
     }
 
     // ── Ambient cursor spotlight glow (only when mouse is active & desktop & not reduced motion) ──
-    if (smoothMouse.x > -1000 && !isLowEndDevice && !isMobile && !prefersReduced) {
+    if (
+      smoothMouse.x > -1000 &&
+      !isLowEndDevice &&
+      !isMobile &&
+      !prefersReduced
+    ) {
       const glowAlpha = CURSOR_GLOW_ALPHA * globalOpacity;
       const grad = ctx.createRadialGradient(
-        smoothMouse.x, smoothMouse.y, 0,
-        smoothMouse.x, smoothMouse.y, CURSOR_GLOW_RADIUS
+        smoothMouse.x,
+        smoothMouse.y,
+        0,
+        smoothMouse.x,
+        smoothMouse.y,
+        CURSOR_GLOW_RADIUS,
       );
       if (isDark) {
-        grad.addColorStop(0, `rgba(59,130,246,${(glowAlpha * 1.2).toFixed(3)})`);
-        grad.addColorStop(0.5, `rgba(37,99,235,${(glowAlpha * 0.4).toFixed(3)})`);
-        grad.addColorStop(1, 'rgba(37,99,235,0)');
+        grad.addColorStop(
+          0,
+          `rgba(59,130,246,${(glowAlpha * 1.2).toFixed(3)})`,
+        );
+        grad.addColorStop(
+          0.5,
+          `rgba(37,99,235,${(glowAlpha * 0.4).toFixed(3)})`,
+        );
+        grad.addColorStop(1, "rgba(37,99,235,0)");
       } else {
         grad.addColorStop(0, `rgba(37,99,235,${(glowAlpha * 0.6).toFixed(3)})`);
-        grad.addColorStop(0.6, `rgba(37,99,235,${(glowAlpha * 0.2).toFixed(3)})`);
-        grad.addColorStop(1, 'rgba(37,99,235,0)');
+        grad.addColorStop(
+          0.6,
+          `rgba(37,99,235,${(glowAlpha * 0.2).toFixed(3)})`,
+        );
+        grad.addColorStop(1, "rgba(37,99,235,0)");
       }
       ctx.fillStyle = grad;
       ctx.fillRect(
         smoothMouse.x - CURSOR_GLOW_RADIUS,
         smoothMouse.y - CURSOR_GLOW_RADIUS,
         CURSOR_GLOW_RADIUS * 2,
-        CURSOR_GLOW_RADIUS * 2
+        CURSOR_GLOW_RADIUS * 2,
       );
     }
 
@@ -411,15 +506,22 @@
       // 1. Move/Drift & Wave ripple math
       if (!prefersReduced && (!isLowEndDevice || dot.twinkle)) {
         const timeFactor = now * dot.driftSpeed;
-        
+
         // Gentle local float/drift
         const localDriftX = Math.sin(timeFactor + dot.seed) * dot.driftAmp;
-        const localDriftY = Math.cos(timeFactor * 0.9 + dot.seed * 1.3) * dot.driftAmp;
+        const localDriftY =
+          Math.cos(timeFactor * 0.9 + dot.seed * 1.3) * dot.driftAmp;
 
         // Subtle wave passing across screen
         const waveVal = now * 0.0005;
-        const rippleX = Math.sin(waveVal + (dot.baseX * 0.004) + (dot.baseY * 0.003)) * 1.2 * dot.depth;
-        const rippleY = Math.cos(waveVal * 0.85 + (dot.baseX * 0.003) + (dot.baseY * 0.004)) * 1.2 * dot.depth;
+        const rippleX =
+          Math.sin(waveVal + dot.baseX * 0.004 + dot.baseY * 0.003) *
+          1.2 *
+          dot.depth;
+        const rippleY =
+          Math.cos(waveVal * 0.85 + dot.baseX * 0.003 + dot.baseY * 0.004) *
+          1.2 *
+          dot.depth;
 
         dot.x = dot.baseX + localDriftX + rippleX;
         dot.y = dot.baseY + localDriftY + rippleY;
@@ -428,12 +530,11 @@
         dot.y = dot.baseY;
       }
 
-      const dx   = mouse.x - dot.x;
-      const dy   = mouse.y - dot.y;
+      const dx = mouse.x - dot.x;
+      const dy = mouse.y - dot.y;
       const distSquared = dx * dx + dy * dy;
-      const influence = distSquared < RADIUS_SQUARED
-        ? 1 - Math.sqrt(distSquared) / RADIUS
-        : 0;
+      const influence =
+        distSquared < RADIUS_SQUARED ? 1 - Math.sqrt(distSquared) / RADIUS : 0;
 
       // 2. Twinkle logic (dual sine)
       let twinkleAlpha = 0;
@@ -469,9 +570,13 @@
         twinkleAlpha *= cursorSuppress;
         twinkleRadiusBoost *= cursorSuppress;
 
-        dot.targetR = tier.dotBase + (tier.dotMax - tier.dotBase) * influence + twinkleRadiusBoost;
+        dot.targetR =
+          tier.dotBase +
+          (tier.dotMax - tier.dotBase) * influence +
+          twinkleRadiusBoost;
       } else {
-        dot.targetR = PLAIN_DOT_BASE + (PLAIN_DOT_MAX - PLAIN_DOT_BASE) * influence;
+        dot.targetR =
+          PLAIN_DOT_BASE + (PLAIN_DOT_MAX - PLAIN_DOT_BASE) * influence;
       }
 
       // Smooth radius transition
@@ -482,7 +587,7 @@
       let cr = Math.round(staticC.r + (cursorC.r - staticC.r) * t);
       let cg = Math.round(staticC.g + (cursorC.g - staticC.g) * t);
       let cb = Math.round(staticC.b + (cursorC.b - staticC.b) * t);
-      
+
       // Base alpha: static opacity at idle, brighter when cursor influence is high
       let alpha = globalOpacity * (0.5 + 0.5 * influence);
 
@@ -506,15 +611,32 @@
 
       // 4. Render dot onto canvas
       // Render radial glow halo only for twinkle stars in dark mode to save performance
-      if (isDark && dot.twinkle && twinkleAlpha > 0.02 && dot.tier.glowSize > 0 && !isMobile && !prefersReduced) {
+      if (
+        isDark &&
+        dot.twinkle &&
+        twinkleAlpha > 0.02 &&
+        dot.tier.glowSize > 0 &&
+        !isMobile &&
+        !prefersReduced
+      ) {
         const glowR = dot.radius + dot.tier.glowSize * twinkleAlpha;
         const grad = ctx.createRadialGradient(
-          dot.x, dot.y, dot.radius * 0.2,
-          dot.x, dot.y, glowR
+          dot.x,
+          dot.y,
+          dot.radius * 0.2,
+          dot.x,
+          dot.y,
+          glowR,
         );
-        grad.addColorStop(0, `rgba(${cr},${cg},${cb},${(alpha * 0.8).toFixed(3)})`);
-        grad.addColorStop(0.5, `rgba(${cr},${cg},${cb},${(alpha * 0.25).toFixed(3)})`);
-        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        grad.addColorStop(
+          0,
+          `rgba(${cr},${cg},${cb},${(alpha * 0.8).toFixed(3)})`,
+        );
+        grad.addColorStop(
+          0.5,
+          `rgba(${cr},${cg},${cb},${(alpha * 0.25).toFixed(3)})`,
+        );
+        grad.addColorStop(1, "rgba(0,0,0,0)");
 
         ctx.beginPath();
         ctx.arc(dot.x, dot.y, glowR, 0, Math.PI * 2);
@@ -562,13 +684,17 @@
       const alpha = (0.35 + 0.65 * envelope) * globalOpacity;
 
       ctx.save();
-      ctx.strokeStyle = isDark ? `rgba(255,255,255,${alpha.toFixed(3)})` : `rgba(37,99,235,${alpha.toFixed(3)})`;
+      ctx.strokeStyle = isDark
+        ? `rgba(255,255,255,${alpha.toFixed(3)})`
+        : `rgba(37,99,235,${alpha.toFixed(3)})`;
       ctx.lineWidth = 1.6;
-      ctx.shadowColor = isDark ? 'rgba(59,130,246,0.55)' : 'rgba(37,99,235,0.3)';
+      ctx.shadowColor = isDark
+        ? "rgba(59,130,246,0.55)"
+        : "rgba(37,99,235,0.3)";
       ctx.shadowBlur = 6 * envelope;
-      
+
       ctx.beginPath();
-      if (s.axis === 'h') {
+      if (s.axis === "h") {
         ctx.moveTo(s.dot.x - len / 2, s.dot.y);
         ctx.lineTo(s.dot.x + len / 2, s.dot.y);
       } else {
@@ -593,13 +719,13 @@
 
   // Mouse tracking
   if (!isMobile) {
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener("mousemove", (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
       resetIdleTimer();
     });
 
-    window.addEventListener('mouseleave', () => {
+    window.addEventListener("mouseleave", () => {
       mouse.x = -9999;
       mouse.y = -9999;
       isIdle = true;
@@ -608,13 +734,13 @@
   }
 
   // Resize
-  window.addEventListener('resize', () => {
+  window.addEventListener("resize", () => {
     stopDrawing();
     resize();
     draw();
   });
 
-  document.addEventListener('visibilitychange', () => {
+  document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       stopDrawing();
       clearTimeout(idleTimer);
@@ -628,7 +754,7 @@
   });
 
   // Theme change
-  document.addEventListener('themeChange', (e) => {
+  document.addEventListener("themeChange", (e) => {
     theme = e.detail.theme;
   });
 
@@ -639,80 +765,81 @@
 // 3. DARK / LIGHT MODE
 
 (function initTheme() {
-  const btn     = document.getElementById('theme-toggle');
-  const icon    = document.getElementById('theme-icon');
-  const html    = document.documentElement;
+  const btn = document.getElementById("theme-toggle");
+  const icon = document.getElementById("theme-icon");
+  const html = document.documentElement;
 
   // Read initial theme set by early script, or default to light
-  const currentTheme = html.getAttribute('data-theme') || 'light';
-  
+  const currentTheme = html.getAttribute("data-theme") || "light";
+
   // Set correct class immediately on load
   if (icon) {
-    icon.className = currentTheme === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
+    icon.className = currentTheme === "dark" ? "bx bx-sun" : "bx bx-moon";
   }
 
-  btn.addEventListener('click', () => {
-    const current = html.getAttribute('data-theme');
-    const next    = current === 'dark' ? 'light' : 'dark';
-    
+  btn.addEventListener("click", () => {
+    const current = html.getAttribute("data-theme");
+    const next = current === "dark" ? "light" : "dark";
+
     // Add theme-changing class for smooth transition
-    html.classList.add('theme-changing');
-    
+    html.classList.add("theme-changing");
+
     // Add rotating class for click feedback animation
     if (icon) {
-      icon.classList.add('theme-animating');
+      icon.classList.add("theme-animating");
       setTimeout(() => {
-        icon.classList.remove('theme-animating');
+        icon.classList.remove("theme-animating");
       }, 500);
     }
 
     applyTheme(next);
-    localStorage.setItem('theme', next);
+    localStorage.setItem("theme", next);
 
     // Remove theme-changing class after transition completes (380ms)
     setTimeout(() => {
-      html.classList.remove('theme-changing');
+      html.classList.remove("theme-changing");
     }, 380);
   });
 
   function applyTheme(t) {
-    html.setAttribute('data-theme', t);
+    html.setAttribute("data-theme", t);
     if (icon) {
-      icon.className = t === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
+      icon.className = t === "dark" ? "bx bx-sun" : "bx bx-moon";
     }
     // Notify canvas
-    document.dispatchEvent(new CustomEvent('themeChange', { detail: { theme: t } }));
+    document.dispatchEvent(
+      new CustomEvent("themeChange", { detail: { theme: t } }),
+    );
   }
 })();
-
 
 //   4. NAVBAR & HAMBURGER MENU
 
 (function initHamburger() {
-  const hamburger = document.getElementById('hamburger');
-  const hamIcon   = document.getElementById('hamburger-icon');
-  const navMenu   = document.getElementById('nav-menu');
+  const hamburger = document.getElementById("hamburger");
+  const hamIcon = document.getElementById("hamburger-icon");
+  const navMenu = document.getElementById("nav-menu");
 
   if (!hamburger || !navMenu) return;
 
-  hamburger.addEventListener('click', () => {
-    const isOpen = navMenu.classList.toggle('open');
-    hamIcon.className = isOpen ? 'bx bx-x' : 'bx bx-menu';
+  hamburger.addEventListener("click", () => {
+    const isOpen = navMenu.classList.toggle("open");
+    hamIcon.className = isOpen ? "bx bx-x" : "bx bx-menu";
   });
 
   // Close on nav link click
-  navMenu.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-      navMenu.classList.remove('open');
-      hamIcon.className = 'bx bx-menu';
+  navMenu.querySelectorAll(".nav-link").forEach((link) => {
+    link.addEventListener("click", () => {
+      navMenu.classList.remove("open");
+      hamIcon.className = "bx bx-menu";
     });
   });
 
   // Close on outside click
-  document.addEventListener('click', (e) => {
+  document.addEventListener("click", (e) => {
     if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
-      navMenu.classList.remove('open');
-      hamIcon.className = 'bx bx-menu';
+      navMenu.classList.remove("open");
+      hamIcon.className = "bx bx-menu";
     }
   });
 })();
@@ -720,28 +847,33 @@
 // 5. SMOOTH SCROLL & ACTIVE NAV LINK (SCROLL SPY)
 
 (function initNavigation() {
-  const sections = Array.from(document.querySelectorAll('section[id]'));
-  const navLinks = Array.from(document.querySelectorAll('.nav-link'));
+  const sections = Array.from(document.querySelectorAll("section[id]"));
+  const navLinks = Array.from(document.querySelectorAll(".nav-link"));
   const anchorLinks = document.querySelectorAll('a[href^="#"]:not([href="#"])');
-  const navbar   = document.getElementById('navbar');
-  const scrollTopBtn = document.getElementById('scroll-top');
-  
+  const navbar = document.getElementById("navbar");
+  const scrollTopBtn = document.getElementById("scroll-top");
+
   let isScrolling = false;
   let scrollTimeout = null;
   let ticking = false;
   let sectionMetrics = [];
   let triggerOffset = 74;
-  let currentActiveId = '';
+  let currentActiveId = "";
 
   function refreshScrollMetrics() {
     const navbarHeight = navbar ? navbar.offsetHeight : 64;
-    const topSpace = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-top-space')) || 0;
+    const topSpace =
+      parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--nav-top-space",
+        ),
+      ) || 0;
     triggerOffset = navbarHeight - 16 + topSpace + 10;
 
-    sectionMetrics = sections.map(sec => {
+    sectionMetrics = sections.map((sec) => {
       const top = sec.offsetTop;
       return {
-        id: sec.getAttribute('id'),
+        id: sec.getAttribute("id"),
         top,
         bottom: top + sec.offsetHeight,
       };
@@ -752,8 +884,11 @@
     if (!activeId || activeId === currentActiveId) return;
 
     currentActiveId = activeId;
-    navLinks.forEach(link => {
-      link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`);
+    navLinks.forEach((link) => {
+      link.classList.toggle(
+        "active",
+        link.getAttribute("href") === `#${activeId}`,
+      );
     });
   }
 
@@ -763,13 +898,13 @@
     const scrollY = window.scrollY;
 
     if (scrollTopBtn) {
-      scrollTopBtn.classList.toggle('visible', scrollY > 400);
+      scrollTopBtn.classList.toggle("visible", scrollY > 400);
     }
 
     if (isScrolling) return;
 
     const triggerLine = scrollY + triggerOffset;
-    let activeId = '';
+    let activeId = "";
 
     for (const sec of sectionMetrics) {
       if (triggerLine >= sec.top && triggerLine < sec.bottom) {
@@ -779,10 +914,12 @@
     }
 
     if (scrollY < 50) {
-      activeId = 'home';
+      activeId = "home";
     }
 
-    const isAtBottom = (window.innerHeight + scrollY) >= (document.documentElement.scrollHeight - 20);
+    const isAtBottom =
+      window.innerHeight + scrollY >=
+      document.documentElement.scrollHeight - 20;
     if (isAtBottom && sectionMetrics.length > 0) {
       activeId = sectionMetrics[sectionMetrics.length - 1].id;
     }
@@ -798,50 +935,58 @@
   }
 
   // 1. Custom Smooth Scroll on Link Click
-  anchorLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      const href = link.getAttribute('href');
+  anchorLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const href = link.getAttribute("href");
       const targetSection = document.querySelector(href);
       if (!targetSection) return;
 
       e.preventDefault();
 
       // Close hamburger if it is open (mobile view)
-      const navMenu = document.getElementById('nav-menu');
-      const hamIcon = document.getElementById('hamburger-icon');
-      if (navMenu && navMenu.classList.contains('open')) {
-        navMenu.classList.remove('open');
-        if (hamIcon) hamIcon.className = 'bx bx-menu';
+      const navMenu = document.getElementById("nav-menu");
+      const hamIcon = document.getElementById("hamburger-icon");
+      if (navMenu && navMenu.classList.contains("open")) {
+        navMenu.classList.remove("open");
+        if (hamIcon) hamIcon.className = "bx bx-menu";
       }
 
       // Calculate target position
       const navbarHeight = navbar ? navbar.offsetHeight : 64;
-      
+
       // Get the variables from CSS
       const style = getComputedStyle(document.documentElement);
-      const topSpace = parseInt(style.getPropertyValue('--nav-top-space')) || 0;
+      const topSpace = parseInt(style.getPropertyValue("--nav-top-space")) || 0;
       // Kurangi offset tambahan agar konten section bergeser lebih naik
       const extraOffset = -16 + topSpace;
 
       // targetPosition = offset dari atas halaman ke target section, dikurangi offset navbar dan extra padding
-      const targetPosition = targetSection.getBoundingClientRect().top + window.scrollY - navbarHeight - extraOffset;
+      const targetPosition =
+        targetSection.getBoundingClientRect().top +
+        window.scrollY -
+        navbarHeight -
+        extraOffset;
 
       // Set flag to prevent Scroll Spy from overriding the active state during smooth scroll
       isScrolling = true;
       clearTimeout(scrollTimeout);
 
       // Instantly set active class on corresponding nav-link (if it exists)
-      const matchingNavLink = document.querySelector(`.nav-link[href="${href}"]`);
+      const matchingNavLink = document.querySelector(
+        `.nav-link[href="${href}"]`,
+      );
       if (matchingNavLink) {
-        navLinks.forEach(l => l.classList.toggle('active', l === matchingNavLink));
+        navLinks.forEach((l) =>
+          l.classList.toggle("active", l === matchingNavLink),
+        );
       } else {
-        navLinks.forEach(l => l.classList.remove('active'));
+        navLinks.forEach((l) => l.classList.remove("active"));
       }
 
       // Scroll smoothly
       window.scrollTo({
         top: targetPosition,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
 
       // Update URL hash without jumping
@@ -856,15 +1001,23 @@
     });
   });
 
-  window.addEventListener('scroll', requestScrollUpdate, { passive: true });
-  window.addEventListener('resize', () => {
-    refreshScrollMetrics();
-    requestScrollUpdate();
-  }, { passive: true });
-  window.addEventListener('load', () => {
-    refreshScrollMetrics();
-    requestScrollUpdate();
-  }, { once: true });
+  window.addEventListener("scroll", requestScrollUpdate, { passive: true });
+  window.addEventListener(
+    "resize",
+    () => {
+      refreshScrollMetrics();
+      requestScrollUpdate();
+    },
+    { passive: true },
+  );
+  window.addEventListener(
+    "load",
+    () => {
+      refreshScrollMetrics();
+      requestScrollUpdate();
+    },
+    { once: true },
+  );
 
   refreshScrollMetrics();
   requestScrollUpdate();
@@ -873,28 +1026,28 @@
 //6. TYPING EFFECT
 
 (function initTyping() {
-  const el = document.getElementById('typing-text');
+  const el = document.getElementById("typing-text");
   if (!el) return;
 
   const words = [
-    'IT Support',
-    'Mahasiswa Sistem Informasi',
-    'Web Development Enthusiast',
-    'Mobile Development Enthusiast',
+    "IT Support",
+    "Mahasiswa Sistem Informasi",
+    "Web Development Enthusiast",
+    "Mobile Development Enthusiast",
   ];
 
-  let wordIdx  = 0;
-  let charIdx  = 0;
+  let wordIdx = 0;
+  let charIdx = 0;
   let deleting = false;
-  let pausing  = false;
+  let pausing = false;
 
   const SPEED_TYPE = 90;
-  const SPEED_DEL  = 50;
-  const PAUSE_END  = 1800;
-  const PAUSE_STR  = 400;
+  const SPEED_DEL = 50;
+  const PAUSE_END = 1800;
+  const PAUSE_STR = 400;
 
   function tick() {
-    const word    = words[wordIdx];
+    const word = words[wordIdx];
     const current = el.textContent;
 
     if (pausing) return;
@@ -908,7 +1061,11 @@
       } else {
         // Pause at end
         pausing = true;
-        setTimeout(() => { pausing = false; deleting = true; tick(); }, PAUSE_END);
+        setTimeout(() => {
+          pausing = false;
+          deleting = true;
+          tick();
+        }, PAUSE_END);
       }
     } else {
       // Deleting
@@ -919,9 +1076,12 @@
       } else {
         // Move to next word
         deleting = false;
-        wordIdx  = (wordIdx + 1) % words.length;
-        pausing  = true;
-        setTimeout(() => { pausing = false; tick(); }, PAUSE_STR);
+        wordIdx = (wordIdx + 1) % words.length;
+        pausing = true;
+        setTimeout(() => {
+          pausing = false;
+          tick();
+        }, PAUSE_STR);
       }
     }
   }
@@ -934,39 +1094,39 @@
 (function initScrollReveal() {
   // Respect user preference for reduced motion
   const prefersReducedMotion = window.matchMedia(
-    '(prefers-reduced-motion: reduce)'
+    "(prefers-reduced-motion: reduce)",
   ).matches;
 
   // Select all elements with reveal classes
   const revealElements = document.querySelectorAll(
-    '.reveal, .reveal-left, .reveal-right, .reveal-up'
+    ".reveal, .reveal-left, .reveal-right, .reveal-up",
   );
 
   if (!revealElements.length) return;
 
   // If user prefers reduced motion, show everything immediately
   if (prefersReducedMotion) {
-    revealElements.forEach(el => el.classList.add('revealed'));
+    revealElements.forEach((el) => el.classList.add("revealed"));
     return;
   }
 
   // Home section elements: reveal immediately after preloader finishes
-  const homeSection = document.getElementById('home');
+  const homeSection = document.getElementById("home");
   if (homeSection) {
     const homeReveals = homeSection.querySelectorAll(
-      '.reveal, .reveal-left, .reveal-right, .reveal-up'
+      ".reveal, .reveal-left, .reveal-right, .reveal-up",
     );
-    
-    const preloader = document.getElementById('preloader');
+
+    const preloader = document.getElementById("preloader");
     if (preloader) {
-      document.addEventListener('preloaderComplete', () => {
+      document.addEventListener("preloaderComplete", () => {
         setTimeout(() => {
-          homeReveals.forEach(el => el.classList.add('revealed'));
+          homeReveals.forEach((el) => el.classList.add("revealed"));
         }, 150);
       });
     } else {
       setTimeout(() => {
-        homeReveals.forEach(el => el.classList.add('revealed'));
+        homeReveals.forEach((el) => el.classList.add("revealed"));
       }, 150);
     }
   }
@@ -974,21 +1134,21 @@
   // IntersectionObserver for all other elements
   const observer = new IntersectionObserver(
     (entries) => {
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
+          entry.target.classList.add("revealed");
           observer.unobserve(entry.target); // animate only once
         }
       });
     },
     {
-      threshold: 0.12,    // trigger when 12% of element is visible
-      rootMargin: '0px 0px -40px 0px' // slight offset from bottom edge
-    }
+      threshold: 0.12, // trigger when 12% of element is visible
+      rootMargin: "0px 0px -40px 0px", // slight offset from bottom edge
+    },
   );
 
   // Observe all reveal elements (except home ones already handled)
-  revealElements.forEach(el => {
+  revealElements.forEach((el) => {
     // Skip home section elements — they animate on load
     if (homeSection && homeSection.contains(el)) return;
     observer.observe(el);
@@ -998,10 +1158,12 @@
 // 8. PROJECT MODAL CONTROLLER
 
 (function initModals() {
-  const openBtns  = document.querySelectorAll('.open-modal');
-  const overlays  = document.querySelectorAll('.modal-overlay');
-  const closeBtns = document.querySelectorAll('.modal-close');
-  const livePreviewQuery = window.matchMedia('(min-width: 769px) and (hover: hover) and (pointer: fine)');
+  const openBtns = document.querySelectorAll(".open-modal");
+  const overlays = document.querySelectorAll(".modal-overlay");
+  const closeBtns = document.querySelectorAll(".modal-close");
+  const livePreviewQuery = window.matchMedia(
+    "(min-width: 769px) and (hover: hover) and (pointer: fine)",
+  );
   let activeModal = null;
   let lastFocusedElement = null;
 
@@ -1010,15 +1172,17 @@
   }
 
   function unloadPreviewIframes(root = document) {
-    root.querySelectorAll('iframe[data-src]').forEach(iframe => {
-      iframe.src = '';
+    root.querySelectorAll("iframe[data-src]").forEach((iframe) => {
+      iframe.src = "";
     });
   }
 
   function getFocusableElements(dialog) {
-    return Array.from(dialog.querySelectorAll(
-      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])'
-    )).filter(element => element.offsetParent !== null);
+    return Array.from(
+      dialog.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((element) => element.offsetParent !== null);
   }
 
   function handlePreviewModeChange(e) {
@@ -1028,7 +1192,7 @@
   }
 
   if (livePreviewQuery.addEventListener) {
-    livePreviewQuery.addEventListener('change', handlePreviewModeChange);
+    livePreviewQuery.addEventListener("change", handlePreviewModeChange);
   } else if (livePreviewQuery.addListener) {
     livePreviewQuery.addListener(handlePreviewModeChange);
   }
@@ -1038,16 +1202,16 @@
     if (el) {
       lastFocusedElement = trigger || document.activeElement;
       activeModal = el;
-      el.classList.add('active');
-      el.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+      el.classList.add("active");
+      el.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
 
-      const iframe = el.querySelector('iframe[data-src]');
+      const iframe = el.querySelector("iframe[data-src]");
       if (iframe) {
-        iframe.src = canLoadLivePreview() ? iframe.dataset.src : '';
+        iframe.src = canLoadLivePreview() ? iframe.dataset.src : "";
       }
 
-      const galleryHero = el.querySelector('.gallery-hero-img[data-src]');
+      const galleryHero = el.querySelector(".gallery-hero-img[data-src]");
       if (galleryHero) {
         galleryHero.src = galleryHero.dataset.src;
       }
@@ -1062,19 +1226,19 @@
   function closeModal(id) {
     const el = document.getElementById(id);
     if (el) {
-      el.classList.remove('active');
-      el.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      el.classList.remove("active");
+      el.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
 
       unloadPreviewIframes(el);
 
-      const video = el.querySelector('video');
+      const video = el.querySelector("video");
       if (video) {
         video.pause();
         video.currentTime = 0;
       }
 
-      const galleryHero = el.querySelector('.gallery-hero-img[data-thumb-src]');
+      const galleryHero = el.querySelector(".gallery-hero-img[data-thumb-src]");
       if (galleryHero) {
         galleryHero.src = galleryHero.dataset.thumbSrc;
       }
@@ -1087,33 +1251,33 @@
     }
   }
 
-  openBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+  openBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
       openModal(btn.dataset.modal, btn);
     });
   });
 
-  closeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+  closeBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
       closeModal(btn.dataset.modal);
     });
   });
 
-  overlays.forEach(overlay => {
-    overlay.addEventListener('click', (e) => {
+  overlays.forEach((overlay) => {
+    overlay.addEventListener("click", (e) => {
       if (e.target === overlay) {
         closeModal(overlay.id);
       }
     });
   });
 
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener("keydown", (e) => {
     if (!activeModal) return;
-    if (e.key === 'Escape') closeModal(activeModal.id);
+    if (e.key === "Escape") closeModal(activeModal.id);
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (!activeModal || e.key !== 'Tab') return;
+  document.addEventListener("keydown", (e) => {
+    if (!activeModal || e.key !== "Tab") return;
 
     const dialog = activeModal.querySelector('[role="dialog"]');
     if (!dialog) return;
@@ -1127,10 +1291,16 @@
 
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+    if (
+      e.shiftKey &&
+      (document.activeElement === first || document.activeElement === dialog)
+    ) {
       e.preventDefault();
       last.focus();
-    } else if (!e.shiftKey && (document.activeElement === last || document.activeElement === dialog)) {
+    } else if (
+      !e.shiftKey &&
+      (document.activeElement === last || document.activeElement === dialog)
+    ) {
       e.preventDefault();
       first.focus();
     }
@@ -1140,22 +1310,22 @@
 // 9. GALLERY SLIDER SYSTEM
 
 (function initGallerySlider() {
-  const gallerySets = document.querySelectorAll('.gallery-thumbnails');
+  const gallerySets = document.querySelectorAll(".gallery-thumbnails");
 
-  gallerySets.forEach(container => {
-    const id       = container.id;
-    const suffix   = id ? id.replace('gallery-thumbs-', '') : '';
-    const heroImg  = document.getElementById('gallery-hero-' + suffix);
-    const caption  = document.getElementById('gallery-caption-' + suffix);
-    const counter  = document.getElementById('gallery-counter-' + suffix);
-    const prevBtn  = document.getElementById('gallery-prev-' + suffix);
-    const nextBtn  = document.getElementById('gallery-next-' + suffix);
-    const thumbs   = container.querySelectorAll('.gallery-thumb');
+  gallerySets.forEach((container) => {
+    const id = container.id;
+    const suffix = id ? id.replace("gallery-thumbs-", "") : "";
+    const heroImg = document.getElementById("gallery-hero-" + suffix);
+    const caption = document.getElementById("gallery-caption-" + suffix);
+    const counter = document.getElementById("gallery-counter-" + suffix);
+    const prevBtn = document.getElementById("gallery-prev-" + suffix);
+    const nextBtn = document.getElementById("gallery-next-" + suffix);
+    const thumbs = container.querySelectorAll(".gallery-thumb");
 
     if (!heroImg || thumbs.length === 0) return;
 
     let currentIdx = 0;
-    const total    = thumbs.length;
+    const total = thumbs.length;
 
     function navigateToIndex(idx, animate, useThumbnail = false) {
       if (idx < 0) idx = total - 1;
@@ -1164,27 +1334,32 @@
 
       currentIdx = idx;
       const thumb = thumbs[idx];
-      const src   = thumb.dataset.src;
-      const displaySrc = useThumbnail && heroImg.dataset.thumbSrc
-        ? heroImg.dataset.thumbSrc
-        : src;
-      const alt   = thumb.dataset.alt || '';
-      const cap   = thumb.dataset.caption || '';
+      const src = thumb.dataset.src;
+      const displaySrc =
+        useThumbnail && heroImg.dataset.thumbSrc
+          ? heroImg.dataset.thumbSrc
+          : src;
+      const alt = thumb.dataset.alt || "";
+      const cap = thumb.dataset.caption || "";
 
-      thumbs.forEach(t => t.classList.remove('active'));
-      thumb.classList.add('active');
+      thumbs.forEach((t) => t.classList.remove("active"));
+      thumb.classList.add("active");
 
-      thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      thumb.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
 
-      if (counter) counter.textContent = (idx + 1) + ' / ' + total;
+      if (counter) counter.textContent = idx + 1 + " / " + total;
 
       if (animate) {
-        heroImg.classList.add('fade-out');
+        heroImg.classList.add("fade-out");
         setTimeout(() => {
           heroImg.src = displaySrc;
           heroImg.alt = alt;
           if (caption) caption.textContent = cap;
-          heroImg.classList.remove('fade-out');
+          heroImg.classList.remove("fade-out");
         }, 280);
       } else {
         heroImg.src = displaySrc;
@@ -1193,42 +1368,45 @@
       }
     }
 
-    container.addEventListener('click', (e) => {
-      const thumb = e.target.closest('.gallery-thumb');
+    container.addEventListener("click", (e) => {
+      const thumb = e.target.closest(".gallery-thumb");
       if (!thumb) return;
       const idx = Array.from(thumbs).indexOf(thumb);
       if (idx !== -1) navigateToIndex(idx, true);
     });
 
     if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
+      prevBtn.addEventListener("click", () => {
         navigateToIndex(currentIdx - 1, true);
       });
     }
     if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
+      nextBtn.addEventListener("click", () => {
         navigateToIndex(currentIdx + 1, true);
       });
     }
 
-    document.addEventListener('keydown', (e) => {
-      const modal = container.closest('.modal-overlay');
-      if (!modal || !modal.classList.contains('active')) return;
+    document.addEventListener("keydown", (e) => {
+      const modal = container.closest(".modal-overlay");
+      if (!modal || !modal.classList.contains("active")) return;
 
-      if (e.key === 'ArrowLeft') {
+      if (e.key === "ArrowLeft") {
         e.preventDefault();
         navigateToIndex(currentIdx - 1, true);
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === "ArrowRight") {
         e.preventDefault();
         navigateToIndex(currentIdx + 1, true);
       }
     });
 
-    const modal = container.closest('.modal-overlay');
+    const modal = container.closest(".modal-overlay");
     if (modal) {
       const observer = new MutationObserver((mutations) => {
-        mutations.forEach(mutation => {
-          if (mutation.attributeName === 'class' && !modal.classList.contains('active')) {
+        mutations.forEach((mutation) => {
+          if (
+            mutation.attributeName === "class" &&
+            !modal.classList.contains("active")
+          ) {
             navigateToIndex(0, false, true);
           }
         });
@@ -1244,48 +1422,56 @@
 //11. CONTACT FORM VALIDATION & DEMO NOTICE
 
 (function initContactForm() {
-  const sendBtn = document.querySelector('.contact-send-btn');
-  const contactForm = sendBtn ? sendBtn.closest('form') : null;
-  const nameInput = document.getElementById('contact-name');
-  const emailInput = document.getElementById('contact-email');
-  const subjectInput = document.getElementById('contact-subject');
-  const messageInput = document.getElementById('contact-message');
+  const sendBtn = document.querySelector(".contact-send-btn");
+  const contactForm = sendBtn ? sendBtn.closest("form") : null;
+  const nameInput = document.getElementById("contact-name");
+  const emailInput = document.getElementById("contact-email");
+  const subjectInput = document.getElementById("contact-subject");
+  const messageInput = document.getElementById("contact-message");
 
-  if (!sendBtn || !contactForm || !nameInput || !emailInput || !subjectInput || !messageInput) return;
+  if (
+    !sendBtn ||
+    !contactForm ||
+    !nameInput ||
+    !emailInput ||
+    !subjectInput ||
+    !messageInput
+  )
+    return;
 
-  let toastContainer = document.querySelector('.toast-container');
+  let toastContainer = document.querySelector(".toast-container");
   if (!toastContainer) {
-    toastContainer = document.createElement('div');
-    toastContainer.className = 'toast-container';
-    toastContainer.setAttribute('role', 'status');
-    toastContainer.setAttribute('aria-live', 'polite');
+    toastContainer = document.createElement("div");
+    toastContainer.className = "toast-container";
+    toastContainer.setAttribute("role", "status");
+    toastContainer.setAttribute("aria-live", "polite");
     document.body.appendChild(toastContainer);
   }
 
-  function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
+  function showToast(message, type = "success") {
+    const toast = document.createElement("div");
     toast.className = `toast toast--${type}`;
-    
+
     const iconClasses = {
-      success: 'bx bxs-check-circle',
-      error: 'bx bxs-error-circle',
-      info: 'bx bxs-info-circle'
+      success: "bx bxs-check-circle",
+      error: "bx bxs-error-circle",
+      info: "bx bxs-info-circle",
     };
     const iconClass = iconClasses[type] || iconClasses.info;
-    
+
     toast.innerHTML = `
       <i class='${iconClass} toast-icon'></i>
       <div class="toast-message">${message}</div>
     `;
-    
+
     toastContainer.appendChild(toast);
-    
+
     setTimeout(() => {
-      toast.classList.add('show');
+      toast.classList.add("show");
     }, 10);
-    
+
     setTimeout(() => {
-      toast.classList.remove('show');
+      toast.classList.remove("show");
       setTimeout(() => {
         toast.remove();
       }, 400);
@@ -1297,86 +1483,86 @@
   }
 
   const inputs = [nameInput, emailInput, subjectInput, messageInput];
-  inputs.forEach(input => {
-    input.addEventListener('input', () => {
+  inputs.forEach((input) => {
+    input.addEventListener("input", () => {
       if (input.setCustomValidity) {
-        input.setCustomValidity('');
+        input.setCustomValidity("");
       }
-      if (input.value.trim() !== '') {
-        input.classList.remove('error');
+      if (input.value.trim() !== "") {
+        input.classList.remove("error");
       }
     });
   });
 
-  contactForm.addEventListener('submit', (e) => {
+  contactForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    
-    inputs.forEach(input => {
-      input.classList.remove('error');
+
+    inputs.forEach((input) => {
+      input.classList.remove("error");
       if (input.setCustomValidity) {
-        input.setCustomValidity('');
+        input.setCustomValidity("");
       }
     });
-    
+
     if (!nameInput.value.trim()) {
-      nameInput.classList.add('error');
+      nameInput.classList.add("error");
       nameInput.reportValidity();
       return;
     }
-    
+
     if (!emailInput.value.trim()) {
-      emailInput.classList.add('error');
+      emailInput.classList.add("error");
       emailInput.reportValidity();
       return;
     } else if (!validateEmail(emailInput.value.trim())) {
-      emailInput.classList.add('error');
-      emailInput.setCustomValidity('Format email tidak valid.');
+      emailInput.classList.add("error");
+      emailInput.setCustomValidity("Format email tidak valid.");
       emailInput.reportValidity();
       return;
     }
-    
+
     if (!subjectInput.value.trim()) {
-      subjectInput.classList.add('error');
+      subjectInput.classList.add("error");
       subjectInput.reportValidity();
       return;
     }
-    
+
     if (!messageInput.value.trim()) {
-      messageInput.classList.add('error');
+      messageInput.classList.add("error");
       messageInput.reportValidity();
       return;
     }
 
     showToast(
-      'Form ini masih demo. Silakan hubungi saya melalui email atau WhatsApp.',
-      'info'
+      "Form ini masih demo. Silakan hubungi saya melalui email atau WhatsApp.",
+      "info",
     );
   });
 })();
 
-
 //12. SCROLL TO TOP
 
 (function initScrollTop() {
-  const btn = document.getElementById('scroll-top');
+  const btn = document.getElementById("scroll-top");
   if (!btn) return;
 
-  btn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 })();
-
 
 //13. LIGHTBOX (FULLSCREEN IMAGE PREVIEW)
 
 (function initLightbox() {
-  const targets = document.querySelectorAll('.gallery-hero-img, .preview-wrap img');
+  const targets = document.querySelectorAll(
+    ".gallery-hero-img, .preview-wrap img",
+  );
   if (targets.length === 0) return;
 
-  let lightbox = document.querySelector('.lightbox-overlay');
+  let lightbox = document.querySelector(".lightbox-overlay");
   if (!lightbox) {
-    lightbox = document.createElement('div');
-    lightbox.className = 'lightbox-overlay';
+    lightbox = document.createElement("div");
+    lightbox.className = "lightbox-overlay";
     lightbox.innerHTML = `
       <button class="lightbox-close" aria-label="Tutup"><i class='bx bx-x'></i></button>
       <button class="lightbox-nav lightbox-nav--prev" aria-label="Gambar sebelumnya"><i class='bx bx-chevron-left'></i></button>
@@ -1384,63 +1570,63 @@
       <img class="lightbox-img" src="" alt="Full Screen Preview" />
     `;
     document.body.appendChild(lightbox);
-    
-    lightbox.addEventListener('click', (e) => {
-      const img = lightbox.querySelector('.lightbox-img');
-      const isNav = e.target.closest('.lightbox-nav');
+
+    lightbox.addEventListener("click", (e) => {
+      const img = lightbox.querySelector(".lightbox-img");
+      const isNav = e.target.closest(".lightbox-nav");
       if (e.target !== img && !isNav) {
-        lightbox.classList.remove('active');
-        const activeModals = document.querySelectorAll('.modal-overlay.active');
+        lightbox.classList.remove("active");
+        const activeModals = document.querySelectorAll(".modal-overlay.active");
         if (activeModals.length === 0) {
-          document.body.style.overflow = '';
+          document.body.style.overflow = "";
         }
       }
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (!lightbox.classList.contains('active')) return;
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox.classList.contains("active")) return;
 
-      if (e.key === 'Escape') {
-        lightbox.classList.remove('active');
-        const activeModals = document.querySelectorAll('.modal-overlay.active');
+      if (e.key === "Escape") {
+        lightbox.classList.remove("active");
+        const activeModals = document.querySelectorAll(".modal-overlay.active");
         if (activeModals.length === 0) {
-          document.body.style.overflow = '';
+          document.body.style.overflow = "";
         }
-      } else if (e.key === 'ArrowLeft') {
+      } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        navigateLightbox('prev');
-      } else if (e.key === 'ArrowRight') {
+        navigateLightbox("prev");
+      } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        navigateLightbox('next');
+        navigateLightbox("next");
       }
     });
 
-    const prevBtn = lightbox.querySelector('.lightbox-nav--prev');
-    const nextBtn = lightbox.querySelector('.lightbox-nav--next');
+    const prevBtn = lightbox.querySelector(".lightbox-nav--prev");
+    const nextBtn = lightbox.querySelector(".lightbox-nav--next");
 
-    prevBtn.addEventListener('click', (e) => {
+    prevBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      navigateLightbox('prev');
+      navigateLightbox("prev");
     });
 
-    nextBtn.addEventListener('click', (e) => {
+    nextBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      navigateLightbox('next');
+      navigateLightbox("next");
     });
   }
 
   function navigateLightbox(direction) {
-    const activeModal = document.querySelector('.modal-overlay.active');
+    const activeModal = document.querySelector(".modal-overlay.active");
     if (!activeModal) return;
 
-    const thumbs = Array.from(activeModal.querySelectorAll('.gallery-thumb'));
+    const thumbs = Array.from(activeModal.querySelectorAll(".gallery-thumb"));
     if (thumbs.length <= 1) return;
 
-    const activeThumb = activeModal.querySelector('.gallery-thumb.active');
+    const activeThumb = activeModal.querySelector(".gallery-thumb.active");
     const activeIdx = thumbs.indexOf(activeThumb);
 
     let targetIdx = 0;
-    if (direction === 'next') {
+    if (direction === "next") {
       targetIdx = (activeIdx + 1) % thumbs.length;
     } else {
       targetIdx = (activeIdx - 1 + thumbs.length) % thumbs.length;
@@ -1448,39 +1634,42 @@
 
     thumbs[targetIdx].click();
 
-    const lightboxImg = lightbox.querySelector('.lightbox-img');
+    const lightboxImg = lightbox.querySelector(".lightbox-img");
     if (lightboxImg) {
       lightboxImg.src = thumbs[targetIdx].dataset.src;
-      lightboxImg.alt = thumbs[targetIdx].dataset.alt || '';
+      lightboxImg.alt = thumbs[targetIdx].dataset.alt || "";
     }
   }
 
-  targets.forEach(img => {
-    img.style.cursor = 'zoom-in';
-    img.title = 'Klik untuk melihat ukuran penuh';
-    
-    img.addEventListener('click', () => {
-      const src = img.getAttribute('src');
-      const alt = img.getAttribute('alt') || '';
-      
-      const lightboxImg = lightbox.querySelector('.lightbox-img');
+  targets.forEach((img) => {
+    img.style.cursor = "zoom-in";
+    img.title = "Klik untuk melihat ukuran penuh";
+
+    img.addEventListener("click", () => {
+      const src = img.getAttribute("src");
+      const alt = img.getAttribute("alt") || "";
+
+      const lightboxImg = lightbox.querySelector(".lightbox-img");
       if (lightboxImg) {
         lightboxImg.src = src;
         lightboxImg.alt = alt;
 
-        const activeModal = document.querySelector('.modal-overlay.active');
-        const prevBtn = lightbox.querySelector('.lightbox-nav--prev');
-        const nextBtn = lightbox.querySelector('.lightbox-nav--next');
-        
-        if (activeModal && activeModal.querySelectorAll('.gallery-thumb').length > 1) {
-          prevBtn.classList.remove('hidden');
-          nextBtn.classList.remove('hidden');
+        const activeModal = document.querySelector(".modal-overlay.active");
+        const prevBtn = lightbox.querySelector(".lightbox-nav--prev");
+        const nextBtn = lightbox.querySelector(".lightbox-nav--next");
+
+        if (
+          activeModal &&
+          activeModal.querySelectorAll(".gallery-thumb").length > 1
+        ) {
+          prevBtn.classList.remove("hidden");
+          nextBtn.classList.remove("hidden");
         } else {
-          prevBtn.classList.add('hidden');
-          nextBtn.classList.add('hidden');
+          prevBtn.classList.add("hidden");
+          nextBtn.classList.add("hidden");
         }
 
-        lightbox.classList.add('active');
+        lightbox.classList.add("active");
       }
     });
   });
