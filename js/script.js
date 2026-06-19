@@ -11,7 +11,7 @@
    - Project Modal Controller
    - Gallery Slider System
    - Video & Iframe Lifecycle
-   - Contact Form Validation & Fake Submit
+   - Contact Form Validation & Demo Notice
    - Scroll to Top
    - Fullscreen Lightbox Image Preview
    */
@@ -27,9 +27,8 @@
   document.body.classList.add('preloader-active');
 
   const totalLength = 283; // 2 * Math.PI * 45
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const displayDuration = prefersReducedMotion ? 450 : 2200;
-  const hardTimeout = prefersReducedMotion ? 700 : 2800;
+  const displayDuration = 2200;
+  const hardTimeout = 2800;
   const intervalTime = 100;
   const startTime = performance.now();
   let pageReady = document.readyState !== 'loading';
@@ -105,14 +104,19 @@
     return;
   }
 
-  // Detect mobile and preferences
+  // Detect device capability once before building the animation.
   const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
   const prefersReduced = reducedMotionQuery.matches;
+  const cpuCores = navigator.hardwareConcurrency || 4;
+  const deviceMemory = navigator.deviceMemory || 4;
+  const isLowEndDevice = cpuCores <= 4 || deviceMemory <= 4;
 
-  // Grid spacing: larger spacing means fewer dots and much better performance
-  const GRID_SPACE = isMobile ? 26 : 20; 
-  const RADIUS     = isMobile ? 120 : 180; // Cursor influence radius
+  const GRID_SPACE = isLowEndDevice ? 34 : 20;
+  const RADIUS = isLowEndDevice ? 150 : 180;
+  const RADIUS_SQUARED = RADIUS * RADIUS;
   const LERP_SPEED = 0.12;
+  const ACTIVE_FRAME_INTERVAL = 1000 / (isLowEndDevice ? 24 : 60);
+  const IDLE_FRAME_INTERVAL = 1000 / (isLowEndDevice ? 8 : 24);
 
   // Idle fade settings
   const IDLE_TIMEOUT   = 1800;
@@ -120,12 +124,17 @@
   const OPACITY_IDLE   = 0.35; // Raised slightly so dots stay visible when idle
   const FADE_SPEED     = 0.02; // Smoother transition
 
-  // Depth tiers for twinkling stars
-  const TIERS = [
-    { name: 'far',  chance: 0.03, dotBase: 0.4, dotMax: 0.8, twinkleMax: 0.3,  driftAmp: 0.4, driftSpeed: 0.0002, glowSize: 0, flareChance: 0 },
-    { name: 'mid',  chance: 0.02, dotBase: 0.6, dotMax: 1.2, twinkleMax: 0.5,  driftAmp: 0.8, driftSpeed: 0.0004, glowSize: 3, flareChance: 0 },
-    { name: 'near', chance: 0.01, dotBase: 0.8, dotMax: 1.6, twinkleMax: 0.65, driftAmp: 1.4, driftSpeed: 0.0006, glowSize: 5, flareChance: 0.1 },
-  ];
+  const TIERS = isLowEndDevice
+    ? [
+        { name: 'far', chance: 0.012, dotBase: 0.4, dotMax: 0.7, twinkleMax: 0.22, driftAmp: 0.25, driftSpeed: 0.00015, glowSize: 0, flareChance: 0 },
+        { name: 'mid', chance: 0.006, dotBase: 0.6, dotMax: 1.0, twinkleMax: 0.3, driftAmp: 0.45, driftSpeed: 0.00025, glowSize: 0, flareChance: 0 },
+        { name: 'near', chance: 0.002, dotBase: 0.8, dotMax: 1.3, twinkleMax: 0.4, driftAmp: 0.7, driftSpeed: 0.00035, glowSize: 0, flareChance: 0 },
+      ]
+    : [
+        { name: 'far', chance: 0.03, dotBase: 0.4, dotMax: 0.8, twinkleMax: 0.3, driftAmp: 0.4, driftSpeed: 0.0002, glowSize: 0, flareChance: 0 },
+        { name: 'mid', chance: 0.02, dotBase: 0.6, dotMax: 1.2, twinkleMax: 0.5, driftAmp: 0.8, driftSpeed: 0.0004, glowSize: 3, flareChance: 0 },
+        { name: 'near', chance: 0.01, dotBase: 0.8, dotMax: 1.6, twinkleMax: 0.65, driftAmp: 1.4, driftSpeed: 0.0006, glowSize: 5, flareChance: 0.1 },
+      ];
   const TOTAL_TWINKLE_CHANCE = TIERS.reduce((s, t) => s + t.chance, 0);
 
   const PLAIN_DOT_BASE = 0.5;
@@ -138,13 +147,14 @@
   const WAVE_SPEED_B_MAX = 0.0010;
 
   // Cursor ambient glow settings
-  const CURSOR_GLOW_RADIUS = isMobile ? 100 : 180;
+  const CURSOR_GLOW_RADIUS = isLowEndDevice ? 140 : 180;
   const CURSOR_GLOW_ALPHA  = 0.08;
 
   let mouse = { x: -9999, y: -9999 };
   let smoothMouse = { x: -9999, y: -9999 };
   let dots  = [];
   let animId;
+  let lastFrameTime = 0;
   let theme = document.documentElement.getAttribute('data-theme') || 'light';
 
   // State variables for smooth canvas color transitions
@@ -161,10 +171,10 @@
   let isIdle       = true;
   let globalOpacity = OPACITY_IDLE;
 
-  // Spark settings and arrays (expanding horizontal/vertical line pulses)
-  const SPARK_INTERVAL = [120, 300];  // Jeda antar kemunculan spark baru (ms)
-  const SPARK_DURATION = [500, 1000]; // Durasi satu spark (ms)
-  const SPARK_LEN      = [20, 50];     // Panjang garis spark (px)
+  const ENABLE_SPARKS = !isLowEndDevice;
+  const SPARK_INTERVAL = [120, 300];
+  const SPARK_DURATION = [500, 1000];
+  const SPARK_LEN = [20, 50];
   let sparks = [];
   let nextSparkAt = 0;
 
@@ -313,6 +323,14 @@
       return;
     }
 
+    const frameTime = timestamp || performance.now();
+    const frameInterval = isIdle ? IDLE_FRAME_INTERVAL : ACTIVE_FRAME_INTERVAL;
+    if (frameTime - lastFrameTime < frameInterval) {
+      animId = requestAnimationFrame(draw);
+      return;
+    }
+    lastFrameTime = frameTime;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Smoothly interpolate colors frame-by-frame
@@ -337,7 +355,7 @@
 
     const staticC = currentStaticColor;
     const cursorC = currentCursorColor;
-    const now     = timestamp || performance.now();
+    const now     = frameTime;
     const isDark  = theme === 'dark';
 
     // Smooth global opacity
@@ -349,7 +367,7 @@
     smoothMouse.y = lerp(smoothMouse.y, mouse.y, 0.15);
 
     // Spawning spark
-    if (!prefersReduced && now >= nextSparkAt) {
+    if (ENABLE_SPARKS && !prefersReduced && now >= nextSparkAt) {
       if (dots.length > 0) {
         const randDot = dots[(Math.random() * dots.length) | 0];
         sparks.push({
@@ -364,7 +382,7 @@
     }
 
     // ── Ambient cursor spotlight glow (only when mouse is active & desktop & not reduced motion) ──
-    if (smoothMouse.x > -1000 && !isMobile && !prefersReduced) {
+    if (smoothMouse.x > -1000 && !isLowEndDevice && !isMobile && !prefersReduced) {
       const glowAlpha = CURSOR_GLOW_ALPHA * globalOpacity;
       const grad = ctx.createRadialGradient(
         smoothMouse.x, smoothMouse.y, 0,
@@ -391,7 +409,7 @@
     // ── Draw dots ──
     for (const dot of dots) {
       // 1. Move/Drift & Wave ripple math
-      if (!prefersReduced) {
+      if (!prefersReduced && (!isLowEndDevice || dot.twinkle)) {
         const timeFactor = now * dot.driftSpeed;
         
         // Gentle local float/drift
@@ -412,8 +430,10 @@
 
       const dx   = mouse.x - dot.x;
       const dy   = mouse.y - dot.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const influence = Math.max(0, 1 - dist / RADIUS);
+      const distSquared = dx * dx + dy * dy;
+      const influence = distSquared < RADIUS_SQUARED
+        ? 1 - Math.sqrt(distSquared) / RADIUS
+        : 0;
 
       // 2. Twinkle logic (dual sine)
       let twinkleAlpha = 0;
@@ -982,6 +1002,8 @@
   const overlays  = document.querySelectorAll('.modal-overlay');
   const closeBtns = document.querySelectorAll('.modal-close');
   const livePreviewQuery = window.matchMedia('(min-width: 769px) and (hover: hover) and (pointer: fine)');
+  let activeModal = null;
+  let lastFocusedElement = null;
 
   function canLoadLivePreview() {
     return livePreviewQuery.matches;
@@ -991,6 +1013,12 @@
     root.querySelectorAll('iframe[data-src]').forEach(iframe => {
       iframe.src = '';
     });
+  }
+
+  function getFocusableElements(dialog) {
+    return Array.from(dialog.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])'
+    )).filter(element => element.offsetParent !== null);
   }
 
   function handlePreviewModeChange(e) {
@@ -1005,16 +1033,28 @@
     livePreviewQuery.addListener(handlePreviewModeChange);
   }
 
-  function openModal(id) {
+  function openModal(id, trigger) {
     const el = document.getElementById(id);
     if (el) {
+      lastFocusedElement = trigger || document.activeElement;
+      activeModal = el;
       el.classList.add('active');
+      el.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
 
-      // Load iframe if present (lazy loading preview)
       const iframe = el.querySelector('iframe[data-src]');
       if (iframe) {
         iframe.src = canLoadLivePreview() ? iframe.dataset.src : '';
+      }
+
+      const galleryHero = el.querySelector('.gallery-hero-img[data-src]');
+      if (galleryHero) {
+        galleryHero.src = galleryHero.dataset.src;
+      }
+
+      const dialog = el.querySelector('[role="dialog"]');
+      if (dialog) {
+        requestAnimationFrame(() => dialog.focus({ preventScroll: true }));
       }
     }
   }
@@ -1023,23 +1063,33 @@
     const el = document.getElementById(id);
     if (el) {
       el.classList.remove('active');
+      el.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
 
-      // Unload iframe if present (to release resources)
       unloadPreviewIframes(el);
 
-      // Pause and reset video if present
       const video = el.querySelector('video');
       if (video) {
         video.pause();
         video.currentTime = 0;
       }
+
+      const galleryHero = el.querySelector('.gallery-hero-img[data-thumb-src]');
+      if (galleryHero) {
+        galleryHero.src = galleryHero.dataset.thumbSrc;
+      }
+
+      activeModal = null;
+      if (lastFocusedElement && document.contains(lastFocusedElement)) {
+        lastFocusedElement.focus({ preventScroll: true });
+      }
+      lastFocusedElement = null;
     }
   }
 
   openBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      openModal(btn.dataset.modal);
+      openModal(btn.dataset.modal, btn);
     });
   });
 
@@ -1057,14 +1107,32 @@
     });
   });
 
-  // Close on Escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      overlays.forEach(o => {
-        if (o.classList.contains('active')) {
-          closeModal(o.id);
-        }
-      });
+    if (!activeModal) return;
+    if (e.key === 'Escape') closeModal(activeModal.id);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!activeModal || e.key !== 'Tab') return;
+
+    const dialog = activeModal.querySelector('[role="dialog"]');
+    if (!dialog) return;
+
+    const focusable = getFocusableElements(dialog);
+    if (focusable.length === 0) {
+      e.preventDefault();
+      dialog.focus();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (document.activeElement === last || document.activeElement === dialog)) {
+      e.preventDefault();
+      first.focus();
     }
   });
 })();
@@ -1089,7 +1157,7 @@
     let currentIdx = 0;
     const total    = thumbs.length;
 
-    function navigateToIndex(idx, animate) {
+    function navigateToIndex(idx, animate, useThumbnail = false) {
       if (idx < 0) idx = total - 1;
       if (idx >= total) idx = 0;
       if (idx === currentIdx && animate) return;
@@ -1097,6 +1165,9 @@
       currentIdx = idx;
       const thumb = thumbs[idx];
       const src   = thumb.dataset.src;
+      const displaySrc = useThumbnail && heroImg.dataset.thumbSrc
+        ? heroImg.dataset.thumbSrc
+        : src;
       const alt   = thumb.dataset.alt || '';
       const cap   = thumb.dataset.caption || '';
 
@@ -1110,13 +1181,13 @@
       if (animate) {
         heroImg.classList.add('fade-out');
         setTimeout(() => {
-          heroImg.src = src;
+          heroImg.src = displaySrc;
           heroImg.alt = alt;
           if (caption) caption.textContent = cap;
           heroImg.classList.remove('fade-out');
         }, 280);
       } else {
-        heroImg.src = src;
+        heroImg.src = displaySrc;
         heroImg.alt = alt;
         if (caption) caption.textContent = cap;
       }
@@ -1158,7 +1229,7 @@
       const observer = new MutationObserver((mutations) => {
         mutations.forEach(mutation => {
           if (mutation.attributeName === 'class' && !modal.classList.contains('active')) {
-            navigateToIndex(0, false);
+            navigateToIndex(0, false, true);
           }
         });
       });
@@ -1170,21 +1241,24 @@
 // 10. VIDEO & IFRAME LIFECYCLE
 // (Pausing and reloading is handled dynamically inside Section 8: Project Modal Controller)
 
-//11. CONTACT FORM VALIDATION & FAKE SUBMIT
+//11. CONTACT FORM VALIDATION & DEMO NOTICE
 
 (function initContactForm() {
   const sendBtn = document.querySelector('.contact-send-btn');
+  const contactForm = sendBtn ? sendBtn.closest('form') : null;
   const nameInput = document.getElementById('contact-name');
   const emailInput = document.getElementById('contact-email');
   const subjectInput = document.getElementById('contact-subject');
   const messageInput = document.getElementById('contact-message');
 
-  if (!sendBtn || !nameInput || !emailInput || !subjectInput || !messageInput) return;
+  if (!sendBtn || !contactForm || !nameInput || !emailInput || !subjectInput || !messageInput) return;
 
   let toastContainer = document.querySelector('.toast-container');
   if (!toastContainer) {
     toastContainer = document.createElement('div');
     toastContainer.className = 'toast-container';
+    toastContainer.setAttribute('role', 'status');
+    toastContainer.setAttribute('aria-live', 'polite');
     document.body.appendChild(toastContainer);
   }
 
@@ -1192,7 +1266,12 @@
     const toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
     
-    const iconClass = type === 'success' ? 'bx bxs-check-circle' : 'bx bxs-error-circle';
+    const iconClasses = {
+      success: 'bx bxs-check-circle',
+      error: 'bx bxs-error-circle',
+      info: 'bx bxs-info-circle'
+    };
+    const iconClass = iconClasses[type] || iconClasses.info;
     
     toast.innerHTML = `
       <i class='${iconClass} toast-icon'></i>
@@ -1229,7 +1308,7 @@
     });
   });
 
-  sendBtn.addEventListener('click', (e) => {
+  contactForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
     inputs.forEach(input => {
@@ -1268,21 +1347,10 @@
       return;
     }
 
-    const originalContent = sendBtn.innerHTML;
-    sendBtn.disabled = true;
-    sendBtn.innerHTML = `<i class='bx bx-loader-alt bx-spin'></i> Mengirim...`;
-    
-    setTimeout(() => {
-      showToast('Pesan berhasil dikirim!', 'success');
-      
-      nameInput.value = '';
-      emailInput.value = '';
-      subjectInput.value = '';
-      messageInput.value = '';
-      
-      sendBtn.disabled = false;
-      sendBtn.innerHTML = originalContent;
-    }, 1500);
+    showToast(
+      'Form ini masih demo. Silakan hubungi saya melalui email atau WhatsApp.',
+      'info'
+    );
   });
 })();
 

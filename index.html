@@ -1,937 +1,1605 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" data-theme="light">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pahruroji — IT Support & Developer</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pahruroji — IT Support & Developer</title>
 
-  <!-- Immediate Theme Setter Script -->
-  <script>
-    (function() {
-      const saved = localStorage.getItem('theme');
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const initial = saved || (systemPrefersDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', initial);
-    })();
-  </script>
+    <!-- Immediate Theme Setter Script -->
+    <script>
+      (function () {
+        const saved = localStorage.getItem("theme");
+        const systemPrefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        const initial = saved || (systemPrefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", initial);
+      })();
+    </script>
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-  <!-- Boxicons CDN -->
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript><link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" /></noscript>
+    <!-- Boxicons CDN -->
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript
+      ><link
+        href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+        rel="stylesheet"
+    /></noscript>
 
-  <!-- Devicon CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" /></noscript>
+    <!-- Devicon CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+    /></noscript>
 
-  <link rel="preload" as="image" href="assets/profile-optimized.png" fetchpriority="high" />
+    <link
+      rel="preload"
+      as="image"
+      href="assets/profile-optimized.png"
+      fetchpriority="high"
+    />
 
-  <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
-
-  <!-- ============ PRELOADER ============ -->
-  <div id="preloader">
-    <div class="preloader-content">
-      <div class="preloader-text-loader">
-        <span style="--delay: 0.15s">P</span>
-        <span style="--delay: 0.3s">l</span>
-        <span style="--delay: 0.45s">e</span>
-        <span style="--delay: 0.6s">a</span>
-        <span style="--delay: 0.75s">s</span>
-        <span style="--delay: 0.9s">e</span>
-        <span class="preloader-space">&nbsp;</span>
-        <span style="--delay: 1.05s">w</span>
-        <span style="--delay: 1.2s">a</span>
-        <span style="--delay: 1.35s">i</span>
-        <span style="--delay: 1.5s">t</span>
-        <span style="--delay: 1.65s">.</span>
-        <span style="--delay: 1.8s">.</span>
-      </div>
-      <div class="preloader-spinner-wrapper">
-        <svg class="preloader-svg" viewBox="0 0 100 100">
-          <circle class="preloader-track" cx="50" cy="50" r="45"></circle>
-          <circle class="preloader-circle" cx="50" cy="50" r="45" id="preloader-circle-bar"></circle>
-        </svg>
-        <div class="preloader-percent" id="preloader-percent">0%</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============ BACKGROUND CANVAS ============ -->
-  <canvas id="bg-canvas"></canvas>
-
-  <!-- ============ NAVBAR ============ -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-container">
-      <a href="#home" class="nav-logo">Pahruroji<span class="dot">.</span></a>
-
-      <ul class="nav-menu" id="nav-menu">
-        <li><a href="#home" class="nav-link active">Home</a></li>
-        <li><a href="#about" class="nav-link">About</a></li>
-        <li><a href="#skills" class="nav-link">Skills</a></li>
-        <li><a href="#projects" class="nav-link">Projects</a></li>
-        <li><a href="#contact" class="nav-link">Contact</a></li>
-      </ul>
-
-      <div class="nav-actions">
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">
-          <i class='bx bx-moon' id="theme-icon"></i>
-        </button>
-        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-          <i class='bx bx-menu' id="hamburger-icon"></i>
-        </button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ============ HOME SECTION ============ -->
-  <section class="section home-section" id="home">
-    <div class="home-container">
-      <div class="home-text reveal-left">
-        <p class="home-greeting">Halo, saya</p>
-        <h1 class="home-name">Pahruroji<span class="dot">.</span></h1>
-        <div class="home-role">
-          <span class="role-static">Seorang </span>
-          <span class="typing-text" id="typing-text"></span><span class="typing-cursor">|</span>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- ============ PRELOADER ============ -->
+    <div id="preloader">
+      <div class="preloader-content">
+        <div class="preloader-text-loader">
+          <span style="--delay: 0.15s">P</span>
+          <span style="--delay: 0.3s">l</span>
+          <span style="--delay: 0.45s">e</span>
+          <span style="--delay: 0.6s">a</span>
+          <span style="--delay: 0.75s">s</span>
+          <span style="--delay: 0.9s">e</span>
+          <span class="preloader-space">&nbsp;</span>
+          <span style="--delay: 1.05s">w</span>
+          <span style="--delay: 1.2s">a</span>
+          <span style="--delay: 1.35s">i</span>
+          <span style="--delay: 1.5s">t</span>
+          <span style="--delay: 1.65s">.</span>
+          <span style="--delay: 1.8s">.</span>
         </div>
-        <p class="home-desc">
-         Saya seorang IT Support dan mahasiswa Sistem Informasi yang memiliki ketertarikan pada teknologi, khususnya Web Development dan Mobile Development.
+        <div class="preloader-spinner-wrapper">
+          <svg class="preloader-svg" viewBox="0 0 100 100">
+            <circle class="preloader-track" cx="50" cy="50" r="45"></circle>
+            <circle
+              class="preloader-circle"
+              cx="50"
+              cy="50"
+              r="45"
+              id="preloader-circle-bar"
+            ></circle>
+          </svg>
+          <div class="preloader-percent" id="preloader-percent">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ BACKGROUND CANVAS ============ -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- ============ NAVBAR ============ -->
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <a href="#home" class="nav-logo">Pahruroji<span class="dot">.</span></a>
+
+        <ul class="nav-menu" id="nav-menu">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#skills" class="nav-link">Skills</a></li>
+          <li><a href="#projects" class="nav-link">Projects</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <button
+            class="theme-toggle"
+            id="theme-toggle"
+            aria-label="Toggle dark/light mode"
+          >
+            <i class="bx bx-moon" id="theme-icon"></i>
+          </button>
+          <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <i class="bx bx-menu" id="hamburger-icon"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ============ HOME SECTION ============ -->
+    <section class="section home-section" id="home">
+      <div class="home-container">
+        <div class="home-text reveal-left">
+          <p class="home-greeting">Halo, saya</p>
+          <h1 class="home-name">Pahruroji<span class="dot">.</span></h1>
+          <div class="home-role">
+            <span class="role-static">Seorang </span>
+            <span class="typing-text" id="typing-text"></span
+            ><span class="typing-cursor">|</span>
+          </div>
+          <p class="home-desc">
+            Saya seorang IT Support dan mahasiswa Sistem Informasi yang memiliki
+            ketertarikan pada teknologi, khususnya Web Development dan Mobile
+            Development.
+          </p>
+          <div class="home-buttons">
+            <a href="#projects" class="btn btn-primary">Lihat Project</a>
+            <a href="#contact" class="btn btn-outline">Hubungi Saya</a>
+          </div>
+        </div>
+
+        <div class="home-photo reveal-right">
+          <div class="photo-container">
+            <div class="photo-blob photo-blob--1"></div>
+            <div class="photo-blob photo-blob--2"></div>
+            <div class="photo-wrapper">
+              <img
+                src="assets/profile-optimized.png"
+                alt="Foto Pahruroji"
+                class="profile-img"
+                width="900"
+                height="897"
+                decoding="async"
+                fetchpriority="high"
+              />
+              <div class="photo-fade"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT SECTION ============ -->
+    <section class="section about-section" id="about">
+      <div class="section-container">
+        <h2 class="section-title reveal">Tentang Saya</h2>
+        <div class="about-content">
+          <div class="about-wrapper">
+            <!-- Card Utama -->
+            <div class="about-card reveal-up" style="--reveal-delay: 0.1s">
+              <div class="about-card-header">
+                <div class="about-icon"><i class="bx bx-user-circle"></i></div>
+                <span class="about-subtitle">Profil Singkat</span>
+              </div>
+              <div class="about-desc">
+                <p>
+                  Saya memiliki pengalaman di bidang IT Support, khususnya dalam
+                  jaringan komputer, troubleshooting perangkat, instalasi
+                  perangkat lunak, serta kebutuhan teknis operasional.
+                </p>
+                <p>
+                  Selain itu, saya juga merupakan mahasiswa Sistem Informasi
+                  yang sedang mengembangkan kemampuan di bidang Web Development
+                  dan Mobile Development. Bagi saya, teknologi adalah bidang
+                  yang terus berkembang, sehingga saya terus belajar, mencoba
+                  hal baru, dan membangun project sederhana sebagai bagian dari
+                  proses pengembangan diri.
+                </p>
+              </div>
+              <div class="about-tags">
+                <span class="tag"
+                  ><i class="bx bx-network-chart"></i> IT Support</span
+                >
+                <span class="tag"
+                  ><i class="bx bxs-graduation"></i> Mahasiswa Sistem
+                  Informasi</span
+                >
+                <span class="tag"
+                  ><i class="bx bx-code-alt"></i> Web Development</span
+                >
+                <span class="tag"
+                  ><i class="bx bx-mobile-alt"></i> Mobile Development</span
+                >
+              </div>
+            </div>
+
+            <!-- Grid Mini Highlight Cards -->
+            <div class="about-highlights-grid">
+              <!-- Highlight 1: IT Support -->
+              <div
+                class="about-highlight-card reveal-up"
+                style="--reveal-delay: 0.2s"
+              >
+                <div class="highlight-header">
+                  <i
+                    class="bx bx-desktop highlight-icon"
+                    style="color: #ef4444"
+                  ></i>
+                  <h4>IT Support</h4>
+                </div>
+                <p class="highlight-text">
+                  Jaringan komputer, troubleshooting perangkat, instalasi
+                  software, dan kebutuhan teknis operasional.
+                </p>
+              </div>
+
+              <!-- Highlight 2: Sistem Informasi -->
+              <div
+                class="about-highlight-card reveal-up"
+                style="--reveal-delay: 0.3s"
+              >
+                <div class="highlight-header">
+                  <i
+                    class="bx bxs-graduation highlight-icon"
+                    style="color: #f59e0b"
+                  ></i>
+                  <h4>Sistem Informasi</h4>
+                </div>
+                <p class="highlight-text">
+                  Mahasiswa Sistem Informasi yang terus belajar dan
+                  mengembangkan kemampuan di bidang teknologi.
+                </p>
+              </div>
+
+              <!-- Highlight 3: Web Development -->
+              <div
+                class="about-highlight-card reveal-up"
+                style="--reveal-delay: 0.4s"
+              >
+                <div class="highlight-header">
+                  <i
+                    class="bx bx-code-alt highlight-icon"
+                    style="color: #3b82f6"
+                  ></i>
+                  <h4>Web Development</h4>
+                </div>
+                <p class="highlight-text">
+                  Sedang belajar membangun website yang responsive, modern, dan
+                  mudah digunakan.
+                </p>
+              </div>
+
+              <!-- Highlight 4: Mobile Development -->
+              <div
+                class="about-highlight-card reveal-up"
+                style="--reveal-delay: 0.5s"
+              >
+                <div class="highlight-header">
+                  <i
+                    class="bx bx-mobile-alt highlight-icon"
+                    style="color: #10b981"
+                  ></i>
+                  <h4>Mobile Development</h4>
+                </div>
+                <p class="highlight-text">
+                  Sedang mengembangkan pemahaman dasar dalam pembuatan aplikasi
+                  mobile.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SKILLS SECTION ============ -->
+    <section class="section skills-section" id="skills">
+      <div class="section-container">
+        <h2 class="section-title reveal">Keahlian</h2>
+        <div class="skills-grid">
+          <!-- Network -->
+          <div class="skill-card reveal-up" style="--reveal-delay: 0.1s">
+            <div class="skill-card-header">
+              <i class="bx bx-network-chart skill-cat-icon"></i>
+              <h3>Network</h3>
+            </div>
+            <div class="skill-pills">
+              <span class="skill-pill"
+                ><i class="bx bx-server" style="color: #0054a6"></i> Konfigurasi
+                MikroTik</span
+              >
+              <span class="skill-pill"
+                ><i class="bx bx-transfer-alt" style="color: #00a8cc"></i>
+                TCP/IP</span
+              >
+              <span class="skill-pill"
+                ><i class="bx bx-globe" style="color: #3b82f6"></i> DNS</span
+              >
+              <span class="skill-pill"
+                ><i class="bx bx-shuffle" style="color: #f59e0b"></i> DHCP</span
+              >
+              <span class="skill-pill"
+                ><i class="bx bx-sitemap" style="color: #8b5cf6"></i> LAN /
+                WAN</span
+              >
+              <span class="skill-pill"
+                ><i class="bx bx-wifi" style="color: #10b981"></i> WiFi</span
+              >
+              <span class="skill-pill"
+                ><i class="bx bx-calculator" style="color: #ec4899"></i>
+                Subnetting</span
+              >
+              <span class="skill-pill"
+                ><i class="bx bx-wrench" style="color: #ef4444"></i>
+                Troubleshooting Komputer</span
+              >
+              <span class="skill-pill"
+                ><i class="bx bx-download" style="color: #6366f1"></i> Instalasi
+                Software</span
+              >
+            </div>
+          </div>
+
+          <!-- Programming -->
+          <div class="skill-card reveal-up" style="--reveal-delay: 0.2s">
+            <div class="skill-card-header">
+              <i class="bx bx-code-block skill-cat-icon"></i>
+              <h3>Programming</h3>
+            </div>
+            <div class="skill-pills">
+              <span class="skill-pill"
+                ><i class="devicon-html5-plain colored"></i> HTML</span
+              >
+              <span class="skill-pill"
+                ><i class="devicon-css3-plain colored"></i> CSS</span
+              >
+              <span class="skill-pill"
+                ><i class="devicon-javascript-plain colored"></i>
+                JavaScript</span
+              >
+              <span class="skill-pill"
+                ><i class="devicon-flutter-plain colored"></i> Flutter
+                Dasar</span
+              >
+              <span class="skill-pill"
+                ><i class="devicon-dart-plain colored"></i> Dart Dasar</span
+              >
+              <span class="skill-pill"
+                ><i class="devicon-git-plain colored"></i> Git & GitHub</span
+              >
+            </div>
+          </div>
+
+          <!-- Tools -->
+          <div class="skill-card reveal-up" style="--reveal-delay: 0.3s">
+            <div class="skill-card-header">
+              <i class="bx bx-wrench skill-cat-icon"></i>
+              <h3>Tools</h3>
+            </div>
+            <div class="skill-pills">
+              <span class="skill-pill"
+                ><i class="devicon-vscode-plain colored"></i> VS Code</span
+              >
+              <span class="skill-pill"
+                ><i
+                  class="devicon-github-original"
+                  style="color: var(--text-main)"
+                ></i>
+                GitHub</span
+              >
+              <span class="skill-pill">
+                <svg
+                  class="skill-icon-svg"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 1.5L2 6.5L12 11.5L22 6.5L12 1.5Z"
+                    fill="#00E5FF"
+                  />
+                  <path
+                    d="M2 16.5L12 21.5L22 16.5V7.5L12 12.5L2 7.5V16.5Z"
+                    fill="#00B0FF"
+                  />
+                  <path d="M12 12.5L22 7.5V16.5L12 21.5V12.5Z" fill="#0081CB" />
+                  <rect
+                    x="7.5"
+                    y="11"
+                    width="2.5"
+                    height="2.5"
+                    fill="#ffffff"
+                    opacity="0.8"
+                  />
+                  <rect
+                    x="14"
+                    y="11"
+                    width="2.5"
+                    height="2.5"
+                    fill="#ffffff"
+                    opacity="0.8"
+                  />
+                </svg>
+                MikroTik Winbox
+              </span>
+              <span class="skill-pill"
+                ><i class="bx bx-spreadsheet" style="color: #217346"></i>
+                Microsoft Office</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS SECTION ============ -->
+    <section class="section projects-section" id="projects">
+      <div class="section-container">
+        <h2 class="section-title reveal">Projects</h2>
+        <div class="projects-grid">
+          <!-- Project 1: Login Page -->
+          <div
+            class="project-card reveal-up"
+            data-modal="modal-3"
+            style="--reveal-delay: 0.1s"
+          >
+            <div class="project-thumb">
+              <img
+                src="assets/thumbs/login_preview.jpg"
+                alt="Login Page Preview"
+                class="project-thumb-img"
+                loading="lazy"
+                decoding="async"
+                width="720"
+                height="370"
+              />
+              <div class="project-overlay">
+                <button
+                  class="btn btn-primary btn-sm open-modal"
+                  data-modal="modal-3"
+                >
+                  Lihat Detail
+                </button>
+              </div>
+            </div>
+            <div class="project-info">
+              <span class="project-type">Frontend Web / UI Design</span>
+              <h3 class="project-name">Login Page</h3>
+              <p class="project-desc">
+                Halaman login dan registrasi dengan desain modern, animasi
+                perpindahan form, serta fitur show/hide password.
+              </p>
+              <div class="project-tech">
+                <span>HTML</span><span>CSS</span><span>JavaScript</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 2: Kedai Kopi Remaja Jompo -->
+          <div
+            class="project-card reveal-up"
+            data-modal="modal-4"
+            style="--reveal-delay: 0.2s"
+          >
+            <div class="project-thumb">
+              <img
+                src="assets/thumbs/kopi_preview.jpg"
+                alt="Kedai Kopi Remaja Jompo Preview"
+                class="project-thumb-img"
+                loading="lazy"
+                decoding="async"
+                width="720"
+                height="342"
+              />
+              <div class="project-overlay">
+                <button
+                  class="btn btn-primary btn-sm open-modal"
+                  data-modal="modal-4"
+                >
+                  Lihat Detail
+                </button>
+              </div>
+            </div>
+            <div class="project-info">
+              <span class="project-type">Frontend Web / Landing Page</span>
+              <h3 class="project-name">Kedai Kopi Remaja Jompo</h3>
+              <p class="project-desc">
+                Website landing page untuk kedai kopi yang menampilkan informasi
+                brand, menu kopi, produk unggulan, kontak, serta detail produk.
+              </p>
+              <div class="project-tech">
+                <span>HTML</span><span>CSS</span><span>JavaScript</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 3: Web Portofolio -->
+          <div
+            class="project-card reveal-up"
+            data-modal="modal-5"
+            style="--reveal-delay: 0.3s"
+          >
+            <div class="project-thumb">
+              <img
+                src="assets/thumbs/landingpage_preview.jpg"
+                alt="Web Portofolio Preview"
+                class="project-thumb-img"
+                loading="lazy"
+                decoding="async"
+                width="720"
+                height="329"
+              />
+              <div class="project-overlay">
+                <button
+                  class="btn btn-primary btn-sm open-modal"
+                  data-modal="modal-5"
+                >
+                  Lihat Detail
+                </button>
+              </div>
+            </div>
+            <div class="project-info">
+              <span class="project-type"
+                >Frontend Web / Personal Portfolio</span
+              >
+              <h3 class="project-name">Web Portofolio</h3>
+              <p class="project-desc">
+                Website portofolio pribadi yang responsif, interaktif, dan
+                modern untuk menampilkan profil, keahlian, project, serta form
+                kontak.
+              </p>
+              <div class="project-tech">
+                <span>HTML</span><span>CSS</span><span>JavaScript</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 4: EDP NetOps -->
+          <div
+            class="project-card reveal-up"
+            data-modal="modal-1"
+            style="--reveal-delay: 0.4s"
+          >
+            <div class="project-thumb">
+              <img
+                src="assets/thumbs/edp_dashboard.jpg"
+                alt="EDP NetOps Dashboard"
+                class="project-thumb-img"
+                loading="lazy"
+                decoding="async"
+                width="720"
+                height="430"
+              />
+              <div class="project-overlay">
+                <button
+                  class="btn btn-primary btn-sm open-modal"
+                  data-modal="modal-1"
+                >
+                  Lihat Detail
+                </button>
+              </div>
+            </div>
+            <div class="project-info">
+              <span class="project-type"
+                >Aplikasi Desktop / Network Operations Tool</span
+              >
+              <h3 class="project-name">EDP NetOps</h3>
+              <p class="project-desc">
+                Aplikasi monitoring dan manajemen operasional IT berbasis
+                Flutter untuk mengelola data jaringan toko/cabang, memantau
+                kondisi perangkat, dan mendukung proses troubleshooting.
+              </p>
+              <div class="project-tech">
+                <span>Flutter</span><span>Dart</span><span>Supabase</span
+                ><span>Node.js</span><span>MikroTik API</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 5: Bot Tambah MAC -->
+          <div
+            class="project-card reveal-up"
+            data-modal="modal-2"
+            style="--reveal-delay: 0.5s"
+          >
+            <div class="project-thumb">
+              <img
+                src="assets/thumbs/bot_tambah_mac.jpg"
+                alt="Bot Tambah MAC"
+                class="project-thumb-img"
+                loading="lazy"
+                decoding="async"
+                width="720"
+                height="576"
+              />
+              <div class="project-overlay">
+                <button
+                  class="btn btn-primary btn-sm open-modal"
+                  data-modal="modal-2"
+                >
+                  Lihat Detail
+                </button>
+              </div>
+            </div>
+            <div class="project-info">
+              <span class="project-type">Network Automation</span>
+              <h3 class="project-name">Bot Tambah MAC</h3>
+              <p class="project-desc">
+                Aplikasi desktop server penghubung antara Telegram Bot,
+                Supabase, dan MikroTik untuk pengelolaan MAC Address jarak jauh.
+              </p>
+              <div class="project-tech">
+                <span>Flutter</span><span>Dart</span><span>Supabase</span
+                ><span>Telegram Bot</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT SECTION ============ -->
+    <section class="section contact-section" id="contact">
+      <div class="section-container">
+        <h2 class="section-title reveal">Kontak</h2>
+        <p class="contact-desc reveal" style="--reveal-delay: 0.1s">
+          Tertarik untuk berdiskusi, bekerja sama, atau melihat project saya
+          lebih lanjut? Silakan hubungi saya melalui kontak berikut.
         </p>
-        <div class="home-buttons">
-          <a href="#projects" class="btn btn-primary">Lihat Project</a>
-          <a href="#contact" class="btn btn-outline">Hubungi Saya</a>
-        </div>
-      </div>
 
-      <div class="home-photo reveal-right">
-        <div class="photo-container">
-          <div class="photo-blob photo-blob--1"></div>
-          <div class="photo-blob photo-blob--2"></div>
-          <div class="photo-wrapper">
-            <img
-              src="assets/profile-optimized.png"
-              alt="Foto Pahruroji"
-              class="profile-img"
-              width="900"
-              height="897"
-              decoding="async"
-              fetchpriority="high"
+        <div class="contact-layout">
+          <!-- Left: Info Cards -->
+          <div class="contact-info reveal-left" style="--reveal-delay: 0.2s">
+            <a href="mailto:pahru.roji735@gmail.com" class="contact-info-card">
+              <div class="cic-icon"><i class="bx bx-envelope"></i></div>
+              <div class="cic-text">
+                <span class="cic-label">Email</span>
+                <span class="cic-value">pahru.roji735@gmail.com</span>
+              </div>
+            </a>
+            <a
+              href="https://wa.me/6283874814132"
+              class="contact-info-card"
+              target="_blank"
+              rel="noopener"
+            >
+              <div class="cic-icon"><i class="bx bxl-whatsapp"></i></div>
+              <div class="cic-text">
+                <span class="cic-label">Phone / WhatsApp</span>
+                <span class="cic-value">+62 83874814132</span>
+              </div>
+            </a>
+            <a
+              href="https://www.linkedin.com/in/pahru-roji-a1959817b/"
+              class="contact-info-card"
+              target="_blank"
+              rel="noopener"
+            >
+              <div class="cic-icon"><i class="bx bxl-linkedin"></i></div>
+              <div class="cic-text">
+                <span class="cic-label">LinkedIn</span>
+                <span class="cic-value">Pahruroji</span>
+              </div>
+            </a>
+            <a
+              href="https://github.com/Pahruroji12"
+              class="contact-info-card"
+              target="_blank"
+              rel="noopener"
+            >
+              <div class="cic-icon"><i class="bx bxl-github"></i></div>
+              <div class="cic-text">
+                <span class="cic-label">GitHub</span>
+                <span class="cic-value">github.com/Pahruroji12 </span>
+              </div>
+            </a>
+            <a
+              href="https://www.instagram.com/pah.12_/"
+              class="contact-info-card"
+              target="_blank"
+              rel="noopener"
+            >
+              <div class="cic-icon"><i class="bx bxl-instagram"></i></div>
+              <div class="cic-text">
+                <span class="cic-label">Instagram</span>
+                <span class="cic-value">@pah.12_</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Right: Message Form -->
+          <form
+            class="contact-form-card reveal-right"
+            style="--reveal-delay: 0.3s"
+          >
+            <div class="form-row">
+              <input
+                type="text"
+                class="form-input"
+                id="contact-name"
+                placeholder="Nama"
+                required
+              />
+              <input
+                type="email"
+                class="form-input"
+                id="contact-email"
+                placeholder="Email"
+                required
+              />
+            </div>
+            <input
+              type="text"
+              class="form-input"
+              id="contact-subject"
+              placeholder="Subjek"
+              required
             />
-            <div class="photo-fade"></div>
-          </div>
+            <textarea
+              class="form-input form-textarea"
+              id="contact-message"
+              placeholder="Pesan"
+              required
+            ></textarea>
+            <button type="submit" class="btn btn-primary contact-send-btn">
+              <i class="bx bx-send"></i> Kirim Pesan
+            </button>
+          </form>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ============ ABOUT SECTION ============ -->
-  <section class="section about-section" id="about">
-    <div class="section-container">
-      <h2 class="section-title reveal">Tentang Saya</h2>
-      <div class="about-content">
-        <div class="about-wrapper">
-          <!-- Card Utama -->
-          <div class="about-card reveal-up" style="--reveal-delay: 0.1s">
-            <div class="about-card-header">
-              <div class="about-icon"><i class='bx bx-user-circle'></i></div>
-              <span class="about-subtitle">Profil Singkat</span>
+    <!-- ============ FOOTER SECTION ============ -->
+    <footer class="footer reveal">
+      <div class="footer-inner">
+        <!-- Footer Logo/Identitas -->
+        <div class="footer-brand">
+          <a href="#home" class="footer-logo"
+            >Pahruroji<span class="dot">.</span></a
+          >
+          <p class="footer-subtitle">
+            IT Support &amp; Mahasiswa Sistem Informasi
+          </p>
+        </div>
+
+        <!-- Footer Navigasi -->
+        <nav class="footer-nav">
+          <a href="#home" class="footer-link">Home</a>
+          <a href="#about" class="footer-link">About</a>
+          <a href="#skills" class="footer-link">Skills</a>
+          <a href="#projects" class="footer-link">Projects</a>
+          <a href="#contact" class="footer-link">Contact</a>
+        </nav>
+
+        <!-- Footer Sosial Media -->
+        <div class="footer-socials">
+          <a
+            href="mailto:pahru.roji735@gmail.com"
+            class="footer-social"
+            aria-label="Email"
+            ><i class="bx bx-envelope"></i
+          ></a>
+          <a
+            href="https://wa.me/6283874814132"
+            class="footer-social"
+            aria-label="WhatsApp"
+            target="_blank"
+            rel="noopener"
+            ><i class="bx bxl-whatsapp"></i
+          ></a>
+          <a
+            href="https://www.linkedin.com/in/pahru-roji-a1959817b/"
+            class="footer-social"
+            aria-label="LinkedIn"
+            target="_blank"
+            rel="noopener"
+            ><i class="bx bxl-linkedin"></i
+          ></a>
+          <a
+            href="https://github.com/Pahruroji12"
+            class="footer-social"
+            aria-label="GitHub"
+            target="_blank"
+            rel="noopener"
+            ><i class="bx bxl-github"></i
+          ></a>
+          <a
+            href="https://www.instagram.com/pah.12_"
+            class="footer-social"
+            aria-label="Instagram"
+            target="_blank"
+            rel="noopener"
+            ><i class="bx bxl-instagram"></i
+          ></a>
+        </div>
+
+        <!-- Copyright -->
+        <p class="footer-copy">&copy; 2026 Pahruroji. All Rights Reserved.</p>
+      </div>
+    </footer>
+
+    <!-- ============ SCROLL TO TOP BUTTON ============ -->
+    <button class="scroll-top" id="scroll-top" aria-label="Kembali ke atas">
+      <i class="bx bx-up-arrow-alt"></i>
+    </button>
+
+    <!-- ============ MODAL: EDP NetOps ============ -->
+    <div class="modal-overlay" id="modal-1" aria-hidden="true">
+      <div
+        class="modal modal--gallery"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-1-title"
+        tabindex="-1"
+      >
+        <button
+          type="button"
+          class="modal-close"
+          data-modal="modal-1"
+          aria-label="Tutup modal EDP NetOps"
+        >
+          <i class="bx bx-x"></i>
+        </button>
+
+        <!-- Gallery Area -->
+        <div class="project-gallery-sticky">
+          <div class="gallery-hero-wrap">
+            <img
+              src="assets/EDP NetOps/thumbs/FormLogin.jpg"
+              data-src="assets/EDP NetOps/FormLogin.png"
+              data-thumb-src="assets/EDP NetOps/thumbs/FormLogin.jpg"
+              alt="Form Login EDP NetOps"
+              class="gallery-hero-img"
+              id="gallery-hero-1"
+              width="320"
+              height="194"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="gallery-hero-caption" id="gallery-caption-1">
+              Form Login
             </div>
-            <div class="about-desc">
+            <!-- Navigation Arrows -->
+            <button
+              class="gallery-nav gallery-nav--prev"
+              id="gallery-prev-1"
+              aria-label="Gambar sebelumnya"
+            >
+              <i class="bx bx-chevron-left"></i>
+            </button>
+            <button
+              class="gallery-nav gallery-nav--next"
+              id="gallery-next-1"
+              aria-label="Gambar berikutnya"
+            >
+              <i class="bx bx-chevron-right"></i>
+            </button>
+            <!-- Image Counter -->
+            <div class="gallery-counter" id="gallery-counter-1">1 / 10</div>
+          </div>
+          <div class="gallery-thumbnails-scroll">
+            <div class="gallery-thumbnails" id="gallery-thumbs-1">
+              <button
+                class="gallery-thumb active"
+                data-src="assets/EDP NetOps/FormLogin.png"
+                data-alt="Form Login EDP NetOps"
+                data-caption="Form Login"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/FormLogin.jpg"
+                  alt="Form Login"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="194"
+                />
+              </button>
+              <button
+                class="gallery-thumb"
+                data-src="assets/EDP NetOps/1_Dashboard.jpeg"
+                data-alt="Dashboard EDP NetOps"
+                data-caption="Dashboard"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/1_Dashboard.jpg"
+                  alt="Dashboard"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="191"
+                />
+              </button>
+              <button
+                class="gallery-thumb"
+                data-src="assets/EDP NetOps/2_Dashboard.jpeg"
+                data-alt="Dashboard EDP NetOps 2"
+                data-caption="Dashboard (2)"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/2_Dashboard.jpg"
+                  alt="Dashboard 2"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="192"
+                />
+              </button>
+              <button
+                class="gallery-thumb"
+                data-src="assets/EDP NetOps/3_ListToko.jpeg"
+                data-alt="List Toko"
+                data-caption="List Toko"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/3_ListToko.jpg"
+                  alt="List Toko"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="191"
+                />
+              </button>
+              <button
+                class="gallery-thumb"
+                data-src="assets/EDP NetOps/4_DetailToko.jpeg"
+                data-alt="Detail Toko"
+                data-caption="Detail Toko"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/4_DetailToko.jpg"
+                  alt="Detail Toko"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="191"
+                />
+              </button>
+              <button
+                class="gallery-thumb"
+                data-src="assets/EDP NetOps/5_DetailToko.jpeg"
+                data-alt="Detail Toko 2"
+                data-caption="Detail Toko (2)"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/5_DetailToko.jpg"
+                  alt="Detail Toko 2"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="191"
+                />
+              </button>
+              <button
+                class="gallery-thumb"
+                data-src="assets/EDP NetOps/6_HistoriTicket.jpeg"
+                data-alt="Histori Ticket"
+                data-caption="Histori Ticket"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/6_HistoriTicket.jpg"
+                  alt="Histori Ticket"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="191"
+                />
+              </button>
+              <button
+                class="gallery-thumb"
+                data-src="assets/EDP NetOps/7_HistoriGangguan.jpeg"
+                data-alt="Histori Gangguan"
+                data-caption="Histori Gangguan"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/7_HistoriGangguan.jpg"
+                  alt="Histori Gangguan"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="190"
+                />
+              </button>
+              <button
+                class="gallery-thumb"
+                data-src="assets/EDP NetOps/8_PingScanner.jpeg"
+                data-alt="Ping Scanner"
+                data-caption="Ping Scanner"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/8_PingScanner.jpg"
+                  alt="Ping Scanner"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="190"
+                />
+              </button>
+              <button
+                class="gallery-thumb"
+                data-src="assets/EDP NetOps/9_ScanWdcp.jpeg"
+                data-alt="Scan WDCP"
+                data-caption="Scan WDCP"
+              >
+                <img
+                  src="assets/EDP NetOps/thumbs/9_ScanWdcp.jpg"
+                  alt="Scan WDCP"
+                  loading="lazy"
+                  decoding="async"
+                  width="320"
+                  height="191"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project Info (scrolls below) -->
+        <div class="modal-info-section">
+          <div class="modal-header">
+            <i class="bx bx-desktop modal-icon"></i>
+            <div>
+              <span class="project-type"
+                >Aplikasi Desktop / Network Operations Tool</span
+              >
+              <h3 id="modal-1-title">EDP NetOps</h3>
+            </div>
+          </div>
+          <div class="modal-body">
+            <p class="modal-desc">
+              EDP NetOps adalah aplikasi monitoring dan manajemen operasional IT
+              berbasis Flutter yang dibuat untuk membantu kebutuhan IT Support
+              dan Network Operations. Aplikasi ini digunakan untuk mengelola
+              data jaringan toko/cabang, memantau kondisi perangkat, mencatat
+              riwayat tiket gangguan, serta menyediakan beberapa tools jaringan
+              untuk mendukung proses troubleshooting secara lebih terstruktur.
+            </p>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-target-lock"></i> Tujuan Aplikasi</h4>
               <p>
-                Saya memiliki pengalaman di bidang IT Support, khususnya dalam jaringan komputer, troubleshooting perangkat, instalasi perangkat lunak, serta kebutuhan teknis operasional.
+                Aplikasi ini dibuat untuk membantu proses monitoring jaringan
+                dan pengelolaan data teknis toko/cabang agar pekerjaan IT
+                Support menjadi lebih cepat, rapi, dan terpusat. Dengan adanya
+                dashboard, data perangkat, riwayat tiket, dan tools jaringan,
+                proses pengecekan gangguan dapat dilakukan dengan lebih efisien.
               </p>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-list-check"></i> Fitur Utama</h4>
+              <ul>
+                <li>Dashboard monitoring dan ringkasan kondisi jaringan</li>
+                <li>Pengelolaan data toko/cabang secara terpusat</li>
+                <li>
+                  Detail perangkat jaringan seperti router, gateway, kasir, STB,
+                  WDCP, dan CCTV
+                </li>
+                <li>Pencatatan dan pengelolaan history ticket gangguan</li>
+                <li>Analisis atau ranking gangguan provider/ISP</li>
+                <li>
+                  Ping scanner untuk membantu pengecekan koneksi perangkat
+                </li>
+                <li>
+                  Integrasi tools jaringan seperti MikroTik API dan remote tools
+                </li>
+                <li>Export data atau laporan ke file Excel</li>
+                <li>Dukungan dark mode dan light mode</li>
+                <li>
+                  Role-based access untuk membatasi akses berdasarkan peran
+                  pengguna
+                </li>
+              </ul>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-code-alt"></i> Teknologi</h4>
+              <div class="project-tech">
+                <span><i class="bx bxl-flutter"></i> Flutter</span>
+                <span><i class="bx bx-code-curly"></i> Dart</span>
+                <span><i class="bx bx-data"></i> Supabase</span>
+                <span><i class="bx bxl-nodejs"></i> Node.js</span>
+                <span><i class="bx bx-code-block"></i> TypeScript</span>
+                <span><i class="bx bx-envelope"></i> IMAP Worker</span>
+                <span><i class="bx bx-mail-send"></i> SMTP Email</span>
+                <span><i class="bx bx-server"></i> MikroTik API</span>
+                <span><i class="bx bx-spreadsheet"></i> Excel Export</span>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-check-circle"></i> Status</h4>
+              <span class="status-badge published"
+                ><i class="bx bx-check-double"></i> Aktif Digunakan — Digunakan
+                Internal</span
+              >
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bxl-github"></i> Repository</h4>
+              <a
+                href="https://github.com/Pahruroji12/Edp_NetOps"
+                class="modal-github-link"
+                target="_blank"
+                rel="noopener"
+              >
+                <i class="bx bxl-github"></i> Edp_NetOps
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MODAL: Bot Tambah MAC ============ -->
+    <div class="modal-overlay" id="modal-2" aria-hidden="true">
+      <div
+        class="modal modal--video"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-2-title"
+        tabindex="-1"
+      >
+        <button
+          type="button"
+          class="modal-close"
+          data-modal="modal-2"
+          aria-label="Tutup modal Bot Tambah MAC"
+        >
+          <i class="bx bx-x"></i>
+        </button>
+
+        <!-- Video Demo (centered, top) -->
+        <div class="video-demo-wrapper">
+          <div class="modal-section">
+            <h4><i class="bx bx-play-circle"></i> Video Demo</h4>
+          </div>
+          <div class="video-wrap">
+            <video class="video-player" controls preload="metadata" poster="">
+              <source src="assets/Bot Tele/Bot.mp4" type="video/mp4" />
+              Browser Anda tidak mendukung pemutaran video.
+            </video>
+          </div>
+        </div>
+
+        <!-- Project Info (below video) -->
+        <div class="modal-video-detail">
+          <div class="modal-header">
+            <i class="bx bx-bot modal-icon"></i>
+            <div>
+              <span class="project-type">Network Automation</span>
+              <h3 id="modal-2-title">Bot Tambah MAC</h3>
+            </div>
+          </div>
+          <div class="modal-body">
+            <p class="modal-desc">
+              Bot Tambah MAC adalah aplikasi desktop Windows berbasis Flutter
+              yang berfungsi sebagai server penghubung antara Telegram Bot,
+              Supabase, dan router MikroTik. Aplikasi ini membantu proses
+              pengelolaan MAC Address pada wireless access-list MikroTik secara
+              jarak jauh melalui perintah Telegram, sehingga pekerjaan teknis
+              dapat dilakukan lebih cepat dan terstruktur.
+            </p>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-target-lock"></i> Tujuan Aplikasi</h4>
               <p>
-                Selain itu, saya juga merupakan mahasiswa Sistem Informasi yang sedang mengembangkan kemampuan di bidang Web Development dan Mobile Development. Bagi saya, teknologi adalah bidang yang terus berkembang, sehingga saya terus belajar, mencoba hal baru, dan membangun project sederhana sebagai bagian dari proses pengembangan diri.
+                Mempermudah tim IT Support atau administrator jaringan dalam
+                melakukan registrasi MAC Address, mengecek perangkat wireless
+                yang sedang terhubung, memantau status router MikroTik, dan
+                melakukan restart router dari jarak jauh tanpa harus membuka
+                Winbox atau melakukan akses manual secara langsung.
               </p>
             </div>
-            <div class="about-tags">
-              <span class="tag"><i class='bx bx-network-chart'></i> IT Support</span>
-              <span class="tag"><i class='bx bxs-graduation'></i> Mahasiswa Sistem Informasi</span>
-              <span class="tag"><i class='bx bx-code-alt'></i> Web Development</span>
-              <span class="tag"><i class='bx bx-mobile-alt'></i> Mobile Development</span>
-            </div>
-          </div>
 
-          <!-- Grid Mini Highlight Cards -->
-          <div class="about-highlights-grid">
-            <!-- Highlight 1: IT Support -->
-            <div class="about-highlight-card reveal-up" style="--reveal-delay: 0.2s">
-              <div class="highlight-header">
-                <i class='bx bx-desktop highlight-icon' style="color: #ef4444;"></i>
-                <h4>IT Support</h4>
+            <div class="modal-section">
+              <h4><i class="bx bx-list-check"></i> Fitur Utama</h4>
+              <ul>
+                <li>Registrasi MAC Address jarak jauh via /tambah</li>
+                <li>Validasi format MAC &amp; pengecekan duplikasi otomatis</li>
+                <li>Monitoring perangkat wireless aktif via /cek</li>
+                <li>Pengecekan status router via /status</li>
+                <li>Restart router jarak jauh via /restart</li>
+                <li>Sistem antrean request agar koneksi tidak bentrok</li>
+                <li>Cache konfigurasi MikroTik dari Supabase</li>
+                <li>
+                  Panel desktop monitoring status, uptime, log &amp; error
+                </li>
+                <li>Integrasi system tray Windows untuk background</li>
+              </ul>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-code-alt"></i> Teknologi</h4>
+              <div class="project-tech">
+                <span><i class="bx bxl-flutter"></i> Flutter Desktop</span>
+                <span><i class="bx bx-code-curly"></i> Dart</span>
+                <span><i class="bx bx-data"></i> Supabase</span>
+                <span><i class="bx bxl-telegram"></i> Telegram Bot API</span>
+                <span><i class="bx bx-server"></i> MikroTik RouterOS API</span>
+                <span><i class="bx bx-transfer-alt"></i> TCP Socket</span>
               </div>
-              <p class="highlight-text">
-                Jaringan komputer, troubleshooting perangkat, instalasi software, dan kebutuhan teknis operasional.
-              </p>
             </div>
 
-            <!-- Highlight 2: Sistem Informasi -->
-            <div class="about-highlight-card reveal-up" style="--reveal-delay: 0.3s">
-              <div class="highlight-header">
-                <i class='bx bxs-graduation highlight-icon' style="color: #f59e0b;"></i>
-                <h4>Sistem Informasi</h4>
-              </div>
-              <p class="highlight-text">
-                Mahasiswa Sistem Informasi yang terus belajar dan mengembangkan kemampuan di bidang teknologi.
-              </p>
-            </div>
-
-            <!-- Highlight 3: Web Development -->
-            <div class="about-highlight-card reveal-up" style="--reveal-delay: 0.4s">
-              <div class="highlight-header">
-                <i class='bx bx-code-alt highlight-icon' style="color: #3b82f6;"></i>
-                <h4>Web Development</h4>
-              </div>
-              <p class="highlight-text">
-                Sedang belajar membangun website yang responsive, modern, dan mudah digunakan.
-              </p>
-            </div>
-
-            <!-- Highlight 4: Mobile Development -->
-            <div class="about-highlight-card reveal-up" style="--reveal-delay: 0.5s">
-              <div class="highlight-header">
-                <i class='bx bx-mobile-alt highlight-icon' style="color: #10b981;"></i>
-                <h4>Mobile Development</h4>
-              </div>
-              <p class="highlight-text">
-                Sedang mengembangkan pemahaman dasar dalam pembuatan aplikasi mobile.
-              </p>
+            <div class="modal-section">
+              <h4><i class="bx bx-check-circle"></i> Status</h4>
+              <span class="status-badge published"
+                ><i class="bx bx-check-double"></i> Selesai &amp; Maintenance —
+                Digunakan Internal</span
+              >
             </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ============ SKILLS SECTION ============ -->
-  <section class="section skills-section" id="skills">
-    <div class="section-container">
-      <h2 class="section-title reveal">Keahlian</h2>
-      <div class="skills-grid">
+    <!-- ============ MODAL: Login Page ============ -->
+    <div class="modal-overlay" id="modal-3" aria-hidden="true">
+      <div
+        class="modal modal--preview"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-3-title"
+        tabindex="-1"
+      >
+        <button
+          type="button"
+          class="modal-close"
+          data-modal="modal-3"
+          aria-label="Tutup modal Login Page"
+        >
+          <i class="bx bx-x"></i>
+        </button>
 
-        <!-- Network -->
-        <div class="skill-card reveal-up" style="--reveal-delay: 0.1s">
-          <div class="skill-card-header">
-            <i class='bx bx-network-chart skill-cat-icon'></i>
-            <h3>Network</h3>
-          </div>
-          <div class="skill-pills">
-            <span class="skill-pill"><i class='bx bx-server' style="color: #0054A6;"></i> Konfigurasi MikroTik</span>
-            <span class="skill-pill"><i class='bx bx-transfer-alt' style="color: #00a8cc;"></i> TCP/IP</span>
-            <span class="skill-pill"><i class='bx bx-globe' style="color: #3b82f6;"></i> DNS</span>
-            <span class="skill-pill"><i class='bx bx-shuffle' style="color: #f59e0b;"></i> DHCP</span>
-            <span class="skill-pill"><i class='bx bx-sitemap' style="color: #8b5cf6;"></i> LAN / WAN</span>
-            <span class="skill-pill"><i class='bx bx-wifi' style="color: #10b981;"></i> WiFi</span>
-            <span class="skill-pill"><i class='bx bx-calculator' style="color: #ec4899;"></i> Subnetting</span>
-            <span class="skill-pill"><i class='bx bx-wrench' style="color: #ef4444;"></i> Troubleshooting Komputer</span>
-            <span class="skill-pill"><i class='bx bx-download' style="color: #6366f1;"></i> Instalasi Software</span>
-          </div>
-        </div>
-
-        <!-- Programming -->
-        <div class="skill-card reveal-up" style="--reveal-delay: 0.2s">
-          <div class="skill-card-header">
-            <i class='bx bx-code-block skill-cat-icon'></i>
-            <h3>Programming</h3>
-          </div>
-          <div class="skill-pills">
-            <span class="skill-pill"><i class="devicon-html5-plain colored"></i> HTML</span>
-            <span class="skill-pill"><i class="devicon-css3-plain colored"></i> CSS</span>
-            <span class="skill-pill"><i class="devicon-javascript-plain colored"></i> JavaScript</span>
-            <span class="skill-pill"><i class="devicon-flutter-plain colored"></i> Flutter Dasar</span>
-            <span class="skill-pill"><i class="devicon-dart-plain colored"></i> Dart Dasar</span>
-            <span class="skill-pill"><i class="devicon-git-plain colored"></i> Git & GitHub</span>
-          </div>
-        </div>
-
-        <!-- Tools -->
-        <div class="skill-card reveal-up" style="--reveal-delay: 0.3s">
-          <div class="skill-card-header">
-            <i class='bx bx-wrench skill-cat-icon'></i>
-            <h3>Tools</h3>
-          </div>
-          <div class="skill-pills">
-            <span class="skill-pill"><i class="devicon-vscode-plain colored"></i> VS Code</span>
-            <span class="skill-pill"><i class="devicon-github-original" style="color: var(--text-main);"></i> GitHub</span>
-            <span class="skill-pill">
-              <svg class="skill-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 1.5L2 6.5L12 11.5L22 6.5L12 1.5Z" fill="#00E5FF"/>
-                <path d="M2 16.5L12 21.5L22 16.5V7.5L12 12.5L2 7.5V16.5Z" fill="#00B0FF"/>
-                <path d="M12 12.5L22 7.5V16.5L12 21.5V12.5Z" fill="#0081CB"/>
-                <rect x="7.5" y="11" width="2.5" height="2.5" fill="#ffffff" opacity="0.8"/>
-                <rect x="14" y="11" width="2.5" height="2.5" fill="#ffffff" opacity="0.8"/>
-              </svg> MikroTik Winbox
-            </span>
-            <span class="skill-pill"><i class='bx bx-spreadsheet' style="color: #217346;"></i> Microsoft Office</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ PROJECTS SECTION ============ -->
-  <section class="section projects-section" id="projects">
-    <div class="section-container">
-      <h2 class="section-title reveal">Projects</h2>
-      <div class="projects-grid">
-
-        <!-- Project 1: Login Page -->
-        <div class="project-card reveal-up" data-modal="modal-3" style="--reveal-delay: 0.1s">
-          <div class="project-thumb">
-            <img src="assets/thumbs/login_preview.jpg" alt="Login Page Preview" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="370" style="object-position: top;" />
-            <div class="project-overlay">
-              <button class="btn btn-primary btn-sm open-modal" data-modal="modal-3">Lihat Detail</button>
-            </div>
-          </div>
-          <div class="project-info">
-            <span class="project-type">Frontend Web / UI Design</span>
-            <h3 class="project-name">Login Page</h3>
-            <p class="project-desc">Halaman login dan registrasi dengan desain modern, animasi perpindahan form, serta fitur show/hide password.</p>
-            <div class="project-tech">
-              <span>HTML</span><span>CSS</span><span>JavaScript</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Project 2: Kedai Kopi Remaja Jompo -->
-        <div class="project-card reveal-up" data-modal="modal-4" style="--reveal-delay: 0.2s">
-          <div class="project-thumb">
-            <img src="assets/thumbs/kopi_preview.jpg" alt="Kedai Kopi Remaja Jompo Preview" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="342" style="object-position: top;" />
-            <div class="project-overlay">
-              <button class="btn btn-primary btn-sm open-modal" data-modal="modal-4">Lihat Detail</button>
-            </div>
-          </div>
-          <div class="project-info">
-            <span class="project-type">Frontend Web / Landing Page</span>
-            <h3 class="project-name">Kedai Kopi Remaja Jompo</h3>
-            <p class="project-desc">Website landing page untuk kedai kopi yang menampilkan informasi brand, menu kopi, produk unggulan, kontak, serta detail produk.</p>
-            <div class="project-tech">
-              <span>HTML</span><span>CSS</span><span>JavaScript</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Project 3: Web Portofolio -->
-        <div class="project-card reveal-up" data-modal="modal-5" style="--reveal-delay: 0.3s">
-          <div class="project-thumb">
-            <img src="assets/thumbs/landingpage_preview.jpg" alt="Web Portofolio Preview" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="329" style="object-position: top;" />
-            <div class="project-overlay">
-              <button class="btn btn-primary btn-sm open-modal" data-modal="modal-5">Lihat Detail</button>
-            </div>
-          </div>
-          <div class="project-info">
-            <span class="project-type">Frontend Web / Personal Portfolio</span>
-            <h3 class="project-name">Web Portofolio</h3>
-            <p class="project-desc">Website portofolio pribadi yang responsif, interaktif, dan modern untuk menampilkan profil, keahlian, project, serta form kontak.</p>
-            <div class="project-tech">
-              <span>HTML</span><span>CSS</span><span>JavaScript</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Project 4: EDP NetOps -->
-        <div class="project-card reveal-up" data-modal="modal-1" style="--reveal-delay: 0.4s">
-          <div class="project-thumb">
-            <img src="assets/thumbs/edp_dashboard.jpg" alt="EDP NetOps Dashboard" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="430" style="object-position: top;" />
-            <div class="project-overlay">
-              <button class="btn btn-primary btn-sm open-modal" data-modal="modal-1">Lihat Detail</button>
-            </div>
-          </div>
-          <div class="project-info">
-            <span class="project-type">Aplikasi Desktop / Network Operations Tool</span>
-            <h3 class="project-name">EDP NetOps</h3>
-            <p class="project-desc">Aplikasi monitoring dan manajemen operasional IT berbasis Flutter untuk mengelola data jaringan toko/cabang, memantau kondisi perangkat, dan mendukung proses troubleshooting.</p>
-            <div class="project-tech">
-              <span>Flutter</span><span>Dart</span><span>Supabase</span><span>Node.js</span><span>MikroTik API</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Project 5: Bot Tambah MAC -->
-        <div class="project-card reveal-up" data-modal="modal-2" style="--reveal-delay: 0.5s">
-          <div class="project-thumb">
-            <img src="assets/thumbs/bot_tambah_mac.jpg" alt="Bot Tambah MAC" class="project-thumb-img" loading="lazy" decoding="async" width="720" height="576" style="object-position: top;" />
-            <div class="project-overlay">
-              <button class="btn btn-primary btn-sm open-modal" data-modal="modal-2">Lihat Detail</button>
-            </div>
-          </div>
-          <div class="project-info">
-            <span class="project-type">Network Automation</span>
-            <h3 class="project-name">Bot Tambah MAC</h3>
-            <p class="project-desc">Aplikasi desktop server penghubung antara Telegram Bot, Supabase, dan MikroTik untuk pengelolaan MAC Address jarak jauh.</p>
-            <div class="project-tech">
-              <span>Flutter</span><span>Dart</span><span>Supabase</span><span>Telegram Bot</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ CONTACT SECTION ============ -->
-  <section class="section contact-section" id="contact">
-    <div class="section-container">
-      <h2 class="section-title reveal">Kontak</h2>
-      <p class="contact-desc reveal" style="--reveal-delay: 0.1s">Tertarik untuk berdiskusi, bekerja sama, atau melihat project saya lebih lanjut? Silakan hubungi saya melalui kontak berikut.</p>
-
-      <div class="contact-layout">
-
-        <!-- Left: Info Cards -->
-        <div class="contact-info reveal-left" style="--reveal-delay: 0.2s">
-          <a href="mailto:pahruroji@email.com" class="contact-info-card">
-            <div class="cic-icon"><i class='bx bx-envelope'></i></div>
-            <div class="cic-text">
-              <span class="cic-label">Email</span>
-              <span class="cic-value">pahru.roji735@gmail.com</span>
-            </div>
-          </a>
-          <a href="https://wa.me/6283874814132" class="contact-info-card" target="_blank" rel="noopener">
-            <div class="cic-icon"><i class='bx bxl-whatsapp'></i></div>
-            <div class="cic-text">
-              <span class="cic-label">Phone / WhatsApp</span>
-              <span class="cic-value">+62 83874814132</span>
-            </div>
-          </a>
-          <a href="https://www.linkedin.com/in/pahru-roji-a1959817b/" class="contact-info-card" target="_blank" rel="noopener">
-            <div class="cic-icon"><i class='bx bxl-linkedin'></i></div>
-            <div class="cic-text">
-              <span class="cic-label">LinkedIn</span>
-              <span class="cic-value">Pahruroji</span>
-            </div>
-          </a>
-          <a href="https://github.com/Pahruroji12" class="contact-info-card" target="_blank" rel="noopener">
-            <div class="cic-icon"><i class='bx bxl-github'></i></div>
-            <div class="cic-text">
-              <span class="cic-label">GitHub</span>
-              <span class="cic-value">github.com/Pahruroji12  </span>
-            </div>
-          </a>
-          <a href="https://www.instagram.com/pah.12_/" class="contact-info-card" target="_blank" rel="noopener">
-            <div class="cic-icon"><i class='bx bxl-instagram'></i></div>
-            <div class="cic-text">
-              <span class="cic-label">Instagram</span>
-              <span class="cic-value">@pah.12_</span>
-            </div>
-          </a>
-        </div>
-
-        <!-- Right: Message Form -->
-        <form class="contact-form-card reveal-right" style="--reveal-delay: 0.3s">
-          <div class="form-row">
-            <input type="text" class="form-input" id="contact-name" placeholder="Nama" required />
-            <input type="email" class="form-input" id="contact-email" placeholder="Email" required />
-          </div>
-          <input type="text" class="form-input" id="contact-subject" placeholder="Subjek" required />
-          <textarea class="form-input form-textarea" id="contact-message" placeholder="Pesan" required></textarea>
-          <button type="submit" class="btn btn-primary contact-send-btn">
-            <i class='bx bx-send'></i> Kirim Pesan
-          </button>
-        </form>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ FOOTER SECTION ============ -->
-  <footer class="footer reveal">
-    <div class="footer-inner">
-      <!-- Footer Logo/Identitas -->
-      <div class="footer-brand">
-        <a href="#home" class="footer-logo">Pahruroji<span class="dot">.</span></a>
-        <p class="footer-subtitle">IT Support &amp; Mahasiswa Sistem Informasi</p>
-      </div>
-
-      <!-- Footer Navigasi -->
-      <nav class="footer-nav">
-        <a href="#home" class="footer-link">Home</a>
-        <a href="#about" class="footer-link">About</a>
-        <a href="#skills" class="footer-link">Skills</a>
-        <a href="#projects" class="footer-link">Projects</a>
-        <a href="#contact" class="footer-link">Contact</a>
-      </nav>
-
-      <!-- Footer Sosial Media -->
-      <div class="footer-socials">
-        <a href="mailto:pahru.roji735@gmail.com" class="footer-social" aria-label="Email"><i class='bx bx-envelope'></i></a>
-        <a href="https://wa.me/6283874814132" class="footer-social" aria-label="WhatsApp" target="_blank" rel="noopener"><i class='bx bxl-whatsapp'></i></a>
-        <a href="https://www.linkedin.com/in/pahru-roji-a1959817b/" class="footer-social" aria-label="LinkedIn" target="_blank" rel="noopener"><i class='bx bxl-linkedin'></i></a>
-        <a href="https://github.com/Pahruroji12" class="footer-social" aria-label="GitHub" target="_blank" rel="noopener"><i class='bx bxl-github'></i></a>
-        <a href="https://www.instagram.com/pah.12_" class="footer-social" aria-label="Instagram" target="_blank" rel="noopener"><i class='bx bxl-instagram'></i></a>
-      </div>
-
-      <!-- Copyright -->
-      <p class="footer-copy">&copy; 2026 Pahruroji. All Rights Reserved.</p>
-    </div>
-  </footer>
-
-  <!-- ============ SCROLL TO TOP BUTTON ============ -->
-  <button class="scroll-top" id="scroll-top" aria-label="Kembali ke atas">
-    <i class='bx bx-up-arrow-alt'></i>
-  </button>
-
-  <!-- ============ MODAL: EDP NetOps ============ -->
-  <div class="modal-overlay" id="modal-1">
-    <div class="modal modal--gallery">
-      <button class="modal-close" data-modal="modal-1"><i class='bx bx-x'></i></button>
-
-      <!-- Gallery Area -->
-      <div class="project-gallery-sticky">
-        <div class="gallery-hero-wrap">
-          <img
-            src="assets/EDP NetOps/FormLogin.png"
-            alt="Form Login EDP NetOps"
-            class="gallery-hero-img"
-            id="gallery-hero-1"
-            width="1306"
-            height="791"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="gallery-hero-caption" id="gallery-caption-1">Form Login</div>
-          <!-- Navigation Arrows -->
-          <button class="gallery-nav gallery-nav--prev" id="gallery-prev-1" aria-label="Gambar sebelumnya">
-            <i class='bx bx-chevron-left'></i>
-          </button>
-          <button class="gallery-nav gallery-nav--next" id="gallery-next-1" aria-label="Gambar berikutnya">
-            <i class='bx bx-chevron-right'></i>
-          </button>
-          <!-- Image Counter -->
-          <div class="gallery-counter" id="gallery-counter-1">1 / 10</div>
-        </div>
-        <div class="gallery-thumbnails-scroll">
-          <div class="gallery-thumbnails" id="gallery-thumbs-1">
-            <button class="gallery-thumb active" data-src="assets/EDP NetOps/FormLogin.png" data-alt="Form Login EDP NetOps" data-caption="Form Login">
-              <img src="assets/EDP NetOps/FormLogin.png" alt="Form Login" loading="lazy" decoding="async" width="1306" height="791" />
-            </button>
-            <button class="gallery-thumb" data-src="assets/EDP NetOps/1_Dashboard.jpeg" data-alt="Dashboard EDP NetOps" data-caption="Dashboard">
-              <img src="assets/EDP NetOps/1_Dashboard.jpeg" alt="Dashboard" loading="lazy" decoding="async" width="1410" height="842" />
-            </button>
-            <button class="gallery-thumb" data-src="assets/EDP NetOps/2_Dashboard.jpeg" data-alt="Dashboard EDP NetOps 2" data-caption="Dashboard (2)">
-              <img src="assets/EDP NetOps/2_Dashboard.jpeg" alt="Dashboard 2" loading="lazy" decoding="async" width="1403" height="841" />
-            </button>
-            <button class="gallery-thumb" data-src="assets/EDP NetOps/3_ListToko.jpeg" data-alt="List Toko" data-caption="List Toko">
-              <img src="assets/EDP NetOps/3_ListToko.jpeg" alt="List Toko" loading="lazy" decoding="async" width="1406" height="841" />
-            </button>
-            <button class="gallery-thumb" data-src="assets/EDP NetOps/4_DetailToko.jpeg" data-alt="Detail Toko" data-caption="Detail Toko">
-              <img src="assets/EDP NetOps/4_DetailToko.jpeg" alt="Detail Toko" loading="lazy" decoding="async" width="1411" height="843" />
-            </button>
-            <button class="gallery-thumb" data-src="assets/EDP NetOps/5_DetailToko.jpeg" data-alt="Detail Toko 2" data-caption="Detail Toko (2)">
-              <img src="assets/EDP NetOps/5_DetailToko.jpeg" alt="Detail Toko 2" loading="lazy" decoding="async" width="1408" height="840" />
-            </button>
-            <button class="gallery-thumb" data-src="assets/EDP NetOps/6_HistoriTicket.jpeg" data-alt="Histori Ticket" data-caption="Histori Ticket">
-              <img src="assets/EDP NetOps/6_HistoriTicket.jpeg" alt="Histori Ticket" loading="lazy" decoding="async" width="1411" height="841" />
-            </button>
-            <button class="gallery-thumb" data-src="assets/EDP NetOps/7_HistoriGangguan.jpeg" data-alt="Histori Gangguan" data-caption="Histori Gangguan">
-              <img src="assets/EDP NetOps/7_HistoriGangguan.jpeg" alt="Histori Gangguan" loading="lazy" decoding="async" width="1410" height="839" />
-            </button>
-            <button class="gallery-thumb" data-src="assets/EDP NetOps/8_PingScanner.jpeg" data-alt="Ping Scanner" data-caption="Ping Scanner">
-              <img src="assets/EDP NetOps/8_PingScanner.jpeg" alt="Ping Scanner" loading="lazy" decoding="async" width="1410" height="836" />
-            </button>
-            <button class="gallery-thumb" data-src="assets/EDP NetOps/9_ScanWdcp.jpeg" data-alt="Scan WDCP" data-caption="Scan WDCP">
-              <img src="assets/EDP NetOps/9_ScanWdcp.jpeg" alt="Scan WDCP" loading="lazy" decoding="async" width="1409" height="840" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Project Info (scrolls below) -->
-      <div class="modal-info-section">
-        <div class="modal-header">
-          <i class='bx bx-desktop modal-icon'></i>
-          <div>
-            <span class="project-type">Aplikasi Desktop / Network Operations Tool</span>
-            <h3>EDP NetOps</h3>
-          </div>
-        </div>
-        <div class="modal-body">
-          <p class="modal-desc">EDP NetOps adalah aplikasi monitoring dan manajemen operasional IT berbasis Flutter yang dibuat untuk membantu kebutuhan IT Support dan Network Operations. Aplikasi ini digunakan untuk mengelola data jaringan toko/cabang, memantau kondisi perangkat, mencatat riwayat tiket gangguan, serta menyediakan beberapa tools jaringan untuk mendukung proses troubleshooting secara lebih terstruktur.</p>
-
+        <!-- Live Preview (iframe, top) -->
+        <div class="preview-demo-wrapper">
           <div class="modal-section">
-            <h4><i class='bx bx-target-lock'></i> Tujuan Aplikasi</h4>
-            <p>Aplikasi ini dibuat untuk membantu proses monitoring jaringan dan pengelolaan data teknis toko/cabang agar pekerjaan IT Support menjadi lebih cepat, rapi, dan terpusat. Dengan adanya dashboard, data perangkat, riwayat tiket, dan tools jaringan, proses pengecekan gangguan dapat dilakukan dengan lebih efisien.</p>
+            <h4><i class="bx bx-window-alt"></i> Live Preview</h4>
           </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-list-check'></i> Fitur Utama</h4>
-            <ul>
-              <li>Dashboard monitoring dan ringkasan kondisi jaringan</li>
-              <li>Pengelolaan data toko/cabang secara terpusat</li>
-              <li>Detail perangkat jaringan seperti router, gateway, kasir, STB, WDCP, dan CCTV</li>
-              <li>Pencatatan dan pengelolaan history ticket gangguan</li>
-              <li>Analisis atau ranking gangguan provider/ISP</li>
-              <li>Ping scanner untuk membantu pengecekan koneksi perangkat</li>
-              <li>Integrasi tools jaringan seperti MikroTik API dan remote tools</li>
-              <li>Export data atau laporan ke file Excel</li>
-              <li>Dukungan dark mode dan light mode</li>
-              <li>Role-based access untuk membatasi akses berdasarkan peran pengguna</li>
-            </ul>
-          </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-code-alt'></i> Teknologi</h4>
-            <div class="project-tech">
-              <span><i class='bx bxl-flutter'></i> Flutter</span>
-              <span><i class='bx bx-code-curly'></i> Dart</span>
-              <span><i class='bx bx-data'></i> Supabase</span>
-              <span><i class='bx bxl-nodejs'></i> Node.js</span>
-              <span><i class='bx bx-code-block'></i> TypeScript</span>
-              <span><i class='bx bx-envelope'></i> IMAP Worker</span>
-              <span><i class='bx bx-mail-send'></i> SMTP Email</span>
-              <span><i class='bx bx-server'></i> MikroTik API</span>
-              <span><i class='bx bx-spreadsheet'></i> Excel Export</span>
+          <div class="preview-wrap">
+            <iframe
+              class="preview-iframe"
+              data-src="https://pahruroji12.github.io/Login_page/"
+              title="Login Page Preview"
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin"
+            ></iframe>
+            <div class="preview-mobile-fallback">
+              <img
+                src="assets/thumbs/login_preview.jpg"
+                alt="Login Page Preview"
+                loading="lazy"
+                decoding="async"
+                width="720"
+                height="370"
+              />
+              <p>Preview live tersedia melalui tombol demo.</p>
             </div>
           </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-check-circle'></i> Status</h4>
-            <span class="status-badge published"><i class='bx bx-check-double'></i> Aktif Digunakan — Digunakan Internal</span>
-          </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bxl-github'></i> Repository</h4>
-            <a href="https://github.com/Pahruroji12/Edp_NetOps" class="modal-github-link" target="_blank" rel="noopener">
-              <i class='bx bxl-github'></i> Edp_NetOps
+          <div class="preview-actions">
+            <a
+              href="https://pahruroji12.github.io/Login_page/"
+              class="btn btn-primary btn-sm"
+              target="_blank"
+              rel="noopener"
+            >
+              <i class="bx bx-link-external"></i> Lihat Demo
             </a>
           </div>
         </div>
-      </div>
 
-    </div>
-  </div>
-
-  <!-- ============ MODAL: Bot Tambah MAC ============ -->
-  <div class="modal-overlay" id="modal-2">
-    <div class="modal modal--video">
-      <button class="modal-close" data-modal="modal-2"><i class='bx bx-x'></i></button>
-
-      <!-- Video Demo (centered, top) -->
-      <div class="video-demo-wrapper">
-        <div class="modal-section">
-          <h4><i class='bx bx-play-circle'></i> Video Demo</h4>
-        </div>
-        <div class="video-wrap">
-          <video
-            class="video-player"
-            controls
-            preload="metadata"
-            poster=""
-          >
-            <source src="assets/Bot Tele/Bot.mp4" type="video/mp4" />
-            Browser Anda tidak mendukung pemutaran video.
-          </video>
-        </div>
-      </div>
-
-      <!-- Project Info (below video) -->
-      <div class="modal-video-detail">
-        <div class="modal-header">
-          <i class='bx bx-bot modal-icon'></i>
-          <div>
-            <span class="project-type">Network Automation</span>
-            <h3>Bot Tambah MAC</h3>
-          </div>
-        </div>
-        <div class="modal-body">
-          <p class="modal-desc">Bot Tambah MAC adalah aplikasi desktop Windows berbasis Flutter yang berfungsi sebagai server penghubung antara Telegram Bot, Supabase, dan router MikroTik. Aplikasi ini membantu proses pengelolaan MAC Address pada wireless access-list MikroTik secara jarak jauh melalui perintah Telegram, sehingga pekerjaan teknis dapat dilakukan lebih cepat dan terstruktur.</p>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-target-lock'></i> Tujuan Aplikasi</h4>
-            <p>Mempermudah tim IT Support atau administrator jaringan dalam melakukan registrasi MAC Address, mengecek perangkat wireless yang sedang terhubung, memantau status router MikroTik, dan melakukan restart router dari jarak jauh tanpa harus membuka Winbox atau melakukan akses manual secara langsung.</p>
-          </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-list-check'></i> Fitur Utama</h4>
-            <ul>
-              <li>Registrasi MAC Address jarak jauh via /tambah</li>
-              <li>Validasi format MAC &amp; pengecekan duplikasi otomatis</li>
-              <li>Monitoring perangkat wireless aktif via /cek</li>
-              <li>Pengecekan status router via /status</li>
-              <li>Restart router jarak jauh via /restart</li>
-              <li>Sistem antrean request agar koneksi tidak bentrok</li>
-              <li>Cache konfigurasi MikroTik dari Supabase</li>
-              <li>Panel desktop monitoring status, uptime, log &amp; error</li>
-              <li>Integrasi system tray Windows untuk background</li>
-            </ul>
-          </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-code-alt'></i> Teknologi</h4>
-            <div class="project-tech">
-              <span><i class='bx bxl-flutter'></i> Flutter Desktop</span>
-              <span><i class='bx bx-code-curly'></i> Dart</span>
-              <span><i class='bx bx-data'></i> Supabase</span>
-              <span><i class='bx bxl-telegram'></i> Telegram Bot API</span>
-              <span><i class='bx bx-server'></i> MikroTik RouterOS API</span>
-              <span><i class='bx bx-transfer-alt'></i> TCP Socket</span>
+        <!-- Project Info (below preview) -->
+        <div class="modal-preview-detail">
+          <div class="modal-header">
+            <i class="bx bx-log-in modal-icon"></i>
+            <div>
+              <span class="project-type">Frontend Web / UI Design</span>
+              <h3 id="modal-3-title">Login Page</h3>
             </div>
           </div>
+          <div class="modal-body">
+            <p class="modal-desc">
+              Login Page adalah project frontend sederhana yang menampilkan
+              halaman login dan registrasi dengan desain modern, animasi
+              perpindahan form, serta fitur show/hide password. Project ini
+              dibuat untuk melatih pemahaman dasar HTML, CSS, JavaScript, layout
+              responsive, dan interaksi sederhana pada tampilan web.
+            </p>
 
-          <div class="modal-section">
-            <h4><i class='bx bx-check-circle'></i> Status</h4>
-            <span class="status-badge published"><i class='bx bx-check-double'></i> Selesai &amp; Maintenance — Digunakan Internal</span>
-          </div>
-        </div>
-      </div>
+            <div class="modal-section">
+              <h4><i class="bx bx-target-lock"></i> Tujuan Project</h4>
+              <p>
+                Project ini dibuat sebagai latihan dalam membangun antarmuka
+                form login dan registrasi yang rapi, interaktif, dan responsive.
+                Selain itu, project ini juga menjadi bagian dari proses belajar
+                saya dalam memahami struktur halaman web, styling CSS, animasi
+                transisi, dan manipulasi elemen menggunakan JavaScript.
+              </p>
+            </div>
 
-    </div>
-  </div>
+            <div class="modal-section">
+              <h4><i class="bx bx-list-check"></i> Fitur Utama</h4>
+              <ul>
+                <li>Form login</li>
+                <li>Form registrasi</li>
+                <li>Animasi perpindahan login dan register</li>
+                <li>Show/hide password</li>
+                <li>Input username, email, dan password</li>
+                <li>Social icon menggunakan Boxicons</li>
+                <li>Tampilan responsive untuk desktop dan mobile</li>
+                <li>Desain modern dengan kombinasi warna biru dan putih</li>
+              </ul>
+            </div>
 
-  <!-- ============ MODAL: Login Page ============ -->
-  <div class="modal-overlay" id="modal-3">
-    <div class="modal modal--preview">
-      <button class="modal-close" data-modal="modal-3"><i class='bx bx-x'></i></button>
+            <div class="modal-section">
+              <h4><i class="bx bx-code-alt"></i> Teknologi</h4>
+              <div class="project-tech">
+                <span><i class="bx bxl-html5"></i> HTML</span>
+                <span><i class="bx bxl-css3"></i> CSS</span>
+                <span><i class="bx bxl-javascript"></i> JavaScript</span>
+                <span><i class="bx bx-box"></i> Boxicons</span>
+              </div>
+            </div>
 
-      <!-- Live Preview (iframe, top) -->
-      <div class="preview-demo-wrapper">
-        <div class="modal-section">
-          <h4><i class='bx bx-window-alt'></i> Live Preview</h4>
-        </div>
-        <div class="preview-wrap">
-          <iframe
-            class="preview-iframe"
-            data-src="https://pahruroji12.github.io/Login_page/"
-            title="Login Page Preview"
-            loading="lazy"
-            sandbox="allow-scripts allow-same-origin"
-          ></iframe>
-          <div class="preview-mobile-fallback">
-            <img src="assets/thumbs/login_preview.jpg" alt="Login Page Preview" loading="lazy" decoding="async" width="720" height="370" />
-            <p>Preview live tersedia melalui tombol demo.</p>
-          </div>
-        </div>
-        <div class="preview-actions">
-          <a href="https://pahruroji12.github.io/Login_page/" class="btn btn-primary btn-sm" target="_blank" rel="noopener">
-            <i class='bx bx-link-external'></i> Lihat Demo
-          </a>
-        </div>
-      </div>
-
-      <!-- Project Info (below preview) -->
-      <div class="modal-preview-detail">
-        <div class="modal-header">
-          <i class='bx bx-log-in modal-icon'></i>
-          <div>
-            <span class="project-type">Frontend Web / UI Design</span>
-            <h3>Login Page</h3>
-          </div>
-        </div>
-        <div class="modal-body">
-          <p class="modal-desc">Login Page adalah project frontend sederhana yang menampilkan halaman login dan registrasi dengan desain modern, animasi perpindahan form, serta fitur show/hide password. Project ini dibuat untuk melatih pemahaman dasar HTML, CSS, JavaScript, layout responsive, dan interaksi sederhana pada tampilan web.</p>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-target-lock'></i> Tujuan Project</h4>
-            <p>Project ini dibuat sebagai latihan dalam membangun antarmuka form login dan registrasi yang rapi, interaktif, dan responsive. Selain itu, project ini juga menjadi bagian dari proses belajar saya dalam memahami struktur halaman web, styling CSS, animasi transisi, dan manipulasi elemen menggunakan JavaScript.</p>
-          </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-list-check'></i> Fitur Utama</h4>
-            <ul>
-              <li>Form login</li>
-              <li>Form registrasi</li>
-              <li>Animasi perpindahan login dan register</li>
-              <li>Show/hide password</li>
-              <li>Input username, email, dan password</li>
-              <li>Social icon menggunakan Boxicons</li>
-              <li>Tampilan responsive untuk desktop dan mobile</li>
-              <li>Desain modern dengan kombinasi warna biru dan putih</li>
-            </ul>
-          </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-code-alt'></i> Teknologi</h4>
-            <div class="project-tech">
-              <span><i class='bx bxl-html5'></i> HTML</span>
-              <span><i class='bx bxl-css3'></i> CSS</span>
-              <span><i class='bx bxl-javascript'></i> JavaScript</span>
-              <span><i class='bx bx-box'></i> Boxicons</span>
+            <div class="modal-section">
+              <h4><i class="bx bx-check-circle"></i> Status</h4>
+              <span class="status-badge published"
+                ><i class="bx bx-check-double"></i> Selesai &mdash;
+                Published</span
+              >
             </div>
           </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-check-circle'></i> Status</h4>
-            <span class="status-badge published"><i class='bx bx-check-double'></i> Selesai &mdash; Published</span>
-          </div>
-
-
         </div>
       </div>
-
     </div>
-  </div>
 
-  <!-- ============ MODAL: Kedai Kopi Remaja Jompo ============ -->
-  <div class="modal-overlay" id="modal-4">
-    <div class="modal modal--preview">
-      <button class="modal-close" data-modal="modal-4"><i class='bx bx-x'></i></button>
+    <!-- ============ MODAL: Kedai Kopi Remaja Jompo ============ -->
+    <div class="modal-overlay" id="modal-4" aria-hidden="true">
+      <div
+        class="modal modal--preview"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-4-title"
+        tabindex="-1"
+      >
+        <button
+          type="button"
+          class="modal-close"
+          data-modal="modal-4"
+          aria-label="Tutup modal Kedai Kopi Remaja Jompo"
+        >
+          <i class="bx bx-x"></i>
+        </button>
 
-      <!-- Live Preview (iframe, top) -->
-      <div class="preview-demo-wrapper">
-        <div class="modal-section">
-          <h4><i class='bx bx-window-alt'></i> Live Preview</h4>
-        </div>
-        <div class="preview-wrap">
-          <iframe
-            class="preview-iframe"
-            data-src="https://remaja-jompo.vercel.app"
-            title="Kedai Kopi Remaja Jompo Preview"
-            loading="lazy"
-            sandbox="allow-scripts allow-same-origin"
-          ></iframe>
-          <div class="preview-mobile-fallback">
-            <img src="assets/thumbs/kopi_preview.jpg" alt="Kedai Kopi Remaja Jompo Preview" loading="lazy" decoding="async" width="720" height="342" />
-            <p>Preview live tersedia melalui tombol demo.</p>
-          </div>
-        </div>
-        <div class="preview-actions">
-          <a href="https://remaja-jompo.vercel.app" class="btn btn-primary btn-sm" target="_blank" rel="noopener">
-            <i class='bx bx-link-external'></i> Lihat Demo
-          </a>
-        </div>
-      </div>
-
-      <!-- Project Info (below preview) -->
-      <div class="modal-preview-detail">
-        <div class="modal-header">
-          <i class='bx bxs-coffee modal-icon'></i>
-          <div>
-            <span class="project-type">Frontend Web / Landing Page</span>
-            <h3>Kedai Kopi Remaja Jompo</h3>
-          </div>
-        </div>
-        <div class="modal-body">
-          <p class="modal-desc">Kedai Kopi Remaja Jompo adalah project website landing page untuk kedai kopi yang menampilkan informasi brand, menu kopi, produk unggulan, kontak, serta detail produk. Project ini dibuat sebagai latihan membangun tampilan website yang menarik, responsive, dan memiliki beberapa interaksi sederhana menggunakan JavaScript.</p>
-
+        <!-- Live Preview (iframe, top) -->
+        <div class="preview-demo-wrapper">
           <div class="modal-section">
-            <h4><i class='bx bx-target-lock'></i> Tujuan Project</h4>
-            <p>Project ini dibuat untuk melatih pembuatan website landing page dengan struktur lengkap, mulai dari navbar, hero section, about, menu, produk, kontak, sampai footer. Selain itu, project ini juga digunakan untuk melatih interaksi JavaScript seperti hamburger menu, search form, shopping cart, dan modal detail produk.</p>
+            <h4><i class="bx bx-window-alt"></i> Live Preview</h4>
           </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-list-check'></i> Fitur Utama</h4>
-            <ul>
-              <li>Navbar dengan menu navigasi</li>
-              <li>Hero section dengan background image</li>
-              <li>Section Tentang Kami</li>
-              <li>Section Menu Kopi</li>
-              <li>Section Produk Unggulan</li>
-              <li>Search form interaktif</li>
-              <li>Shopping cart sidebar</li>
-              <li>Modal detail produk</li>
-              <li>Google Maps embed pada section kontak</li>
-              <li>Form kontak sederhana</li>
-              <li>Footer dengan social media link</li>
-              <li>Responsive design untuk desktop, tablet, dan mobile</li>
-            </ul>
-          </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-code-alt'></i> Teknologi</h4>
-            <div class="project-tech">
-              <span><i class='bx bxl-html5'></i> HTML</span>
-              <span><i class='bx bxl-css3'></i> CSS</span>
-              <span><i class='bx bxl-javascript'></i> JavaScript</span>
-              <span><i class='bx bx-font'></i> Google Fonts</span>
-              <span><i class='bx bx-map-alt'></i> Google Maps Embed</span>
-              <span><i class='bx bx-cloud-upload'></i> Vercel</span>
+          <div class="preview-wrap">
+            <iframe
+              class="preview-iframe"
+              data-src="https://remaja-jompo.vercel.app"
+              title="Kedai Kopi Remaja Jompo Preview"
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin"
+            ></iframe>
+            <div class="preview-mobile-fallback">
+              <img
+                src="assets/thumbs/kopi_preview.jpg"
+                alt="Kedai Kopi Remaja Jompo Preview"
+                loading="lazy"
+                decoding="async"
+                width="720"
+                height="342"
+              />
+              <p>Preview live tersedia melalui tombol demo.</p>
             </div>
           </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-check-circle'></i> Status</h4>
-            <span class="status-badge published"><i class='bx bx-check-double'></i> Selesai &mdash; Published</span>
+          <div class="preview-actions">
+            <a
+              href="https://remaja-jompo.vercel.app"
+              class="btn btn-primary btn-sm"
+              target="_blank"
+              rel="noopener"
+            >
+              <i class="bx bx-link-external"></i> Lihat Demo
+            </a>
           </div>
         </div>
-      </div>
 
-    </div>
-  </div>
-
-  <!-- ============ MODAL: Web Portofolio ============ -->
-  <div class="modal-overlay" id="modal-5">
-    <div class="modal modal--preview">
-      <button class="modal-close" data-modal="modal-5"><i class='bx bx-x'></i></button>
-
-      <!-- Preview Image (top) -->
-      <div class="preview-demo-wrapper">
-        <div class="modal-section">
-          <h4><i class='bx bx-image'></i> Preview Tampilan</h4>
-        </div>
-        <div class="preview-wrap preview-wrap--image" style="background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden;">
-          <img
-            src="assets/landingpage_preview.png"
-            alt="Web Portofolio Preview"
-            style="width: 100%; height: auto; display: block;"
-            loading="lazy"
-            decoding="async"
-            width="1898"
-            height="867"
-          />
-        </div>
-        <div class="preview-actions">
-          <a href="https://github.com/Pahruroji12/Web_Portofolio" class="btn btn-primary btn-sm" target="_blank" rel="noopener">
-            <i class='bx bxl-github'></i> Repository GitHub
-          </a>
-        </div>
-      </div>
-
-      <!-- Project Info (below preview) -->
-      <div class="modal-preview-detail">
-        <div class="modal-header">
-          <i class='bx bx-folder modal-icon'></i>
-          <div>
-            <span class="project-type">Frontend Web / Personal Portfolio</span>
-            <h3>Web Portofolio</h3>
-          </div>
-        </div>
-        <div class="modal-body">
-          <p class="modal-desc">Web Portofolio adalah website pribadi yang dirancang sebagai media personal branding untuk menampilkan profil, pengalaman kerja di bidang IT Support, daftar keahlian, dan riwayat project. Website ini mengusung tema minimalis-modern dengan animasi interaktif pada background dan dukungan mode terang/gelap.</p>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-target-lock'></i> Tujuan Project</h4>
-            <p>Membuat media portofolio interaktif yang representatif, cepat diakses, responsif di berbagai perangkat, serta menunjukkan keahlian di bidang networking, programming dasar, dan tools yang dikuasai secara profesional.</p>
-          </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-list-check'></i> Fitur Utama</h4>
-            <ul>
-              <li>Desain modern, responsif, dan bersih untuk berbagai resolusi layar</li>
-              <li>Background interaktif Interactive Dot Matrix Grid berbasis HTML5 Canvas</li>
-              <li>Sistem tema gelap (Dark Mode) dan terang (Light Mode) yang terintegrasi dengan localStorage</li>
-              <li>Typing effect interaktif pada bagian role/pekerjaan</li>
-              <li>Navigasi menu smooth scroll dengan Scroll Spy aktif</li>
-              <li>Project card interaktif dengan modal popup detail</li>
-              <li>Form kontak dengan sistem validasi real-time dan notifikasi Toast</li>
-            </ul>
-          </div>
-
-          <div class="modal-section">
-            <h4><i class='bx bx-code-alt'></i> Teknologi</h4>
-            <div class="project-tech">
-              <span><i class='bx bxl-html5'></i> HTML</span>
-              <span><i class='bx bxl-css3'></i> CSS</span>
-              <span><i class='bx bxl-javascript'></i> JavaScript</span>
-              <span><i class='bx bx-font'></i> Google Fonts</span>
-              <span><i class='bx bx-box'></i> Boxicons</span>
+        <!-- Project Info (below preview) -->
+        <div class="modal-preview-detail">
+          <div class="modal-header">
+            <i class="bx bxs-coffee modal-icon"></i>
+            <div>
+              <span class="project-type">Frontend Web / Landing Page</span>
+              <h3 id="modal-4-title">Kedai Kopi Remaja Jompo</h3>
             </div>
           </div>
+          <div class="modal-body">
+            <p class="modal-desc">
+              Kedai Kopi Remaja Jompo adalah project website landing page untuk
+              kedai kopi yang menampilkan informasi brand, menu kopi, produk
+              unggulan, kontak, serta detail produk. Project ini dibuat sebagai
+              latihan membangun tampilan website yang menarik, responsive, dan
+              memiliki beberapa interaksi sederhana menggunakan JavaScript.
+            </p>
 
-          <div class="modal-section">
-            <h4><i class='bx bx-check-circle'></i> Status</h4>
-            <span class="status-badge published"><i class='bx bx-check-double'></i> Selesai &mdash; Live</span>
+            <div class="modal-section">
+              <h4><i class="bx bx-target-lock"></i> Tujuan Project</h4>
+              <p>
+                Project ini dibuat untuk melatih pembuatan website landing page
+                dengan struktur lengkap, mulai dari navbar, hero section, about,
+                menu, produk, kontak, sampai footer. Selain itu, project ini
+                juga digunakan untuk melatih interaksi JavaScript seperti
+                hamburger menu, search form, shopping cart, dan modal detail
+                produk.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-list-check"></i> Fitur Utama</h4>
+              <ul>
+                <li>Navbar dengan menu navigasi</li>
+                <li>Hero section dengan background image</li>
+                <li>Section Tentang Kami</li>
+                <li>Section Menu Kopi</li>
+                <li>Section Produk Unggulan</li>
+                <li>Search form interaktif</li>
+                <li>Shopping cart sidebar</li>
+                <li>Modal detail produk</li>
+                <li>Google Maps embed pada section kontak</li>
+                <li>Form kontak sederhana</li>
+                <li>Footer dengan social media link</li>
+                <li>Responsive design untuk desktop, tablet, dan mobile</li>
+              </ul>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-code-alt"></i> Teknologi</h4>
+              <div class="project-tech">
+                <span><i class="bx bxl-html5"></i> HTML</span>
+                <span><i class="bx bxl-css3"></i> CSS</span>
+                <span><i class="bx bxl-javascript"></i> JavaScript</span>
+                <span><i class="bx bx-font"></i> Google Fonts</span>
+                <span><i class="bx bx-map-alt"></i> Google Maps Embed</span>
+                <span><i class="bx bx-cloud-upload"></i> Vercel</span>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-check-circle"></i> Status</h4>
+              <span class="status-badge published"
+                ><i class="bx bx-check-double"></i> Selesai &mdash;
+                Published</span
+              >
+            </div>
           </div>
         </div>
       </div>
-
     </div>
-  </div>
 
-  <script src="js/script.js"></script>
-</body>
+    <!-- ============ MODAL: Web Portofolio ============ -->
+    <div class="modal-overlay" id="modal-5" aria-hidden="true">
+      <div
+        class="modal modal--preview"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-5-title"
+        tabindex="-1"
+      >
+        <button
+          type="button"
+          class="modal-close"
+          data-modal="modal-5"
+          aria-label="Tutup modal Web Portofolio"
+        >
+          <i class="bx bx-x"></i>
+        </button>
+
+        <!-- Preview Image (top) -->
+        <div class="preview-demo-wrapper">
+          <div class="modal-section">
+            <h4><i class="bx bx-image"></i> Preview Tampilan</h4>
+          </div>
+          <div class="preview-wrap preview-wrap--image">
+            <img
+              src="assets/landingpage_preview.png"
+              alt="Web Portofolio Preview"
+              loading="lazy"
+              decoding="async"
+              width="1898"
+              height="867"
+            />
+          </div>
+          <div class="preview-actions">
+            <a
+              href="https://github.com/Pahruroji12/Web_Portofolio"
+              class="btn btn-primary btn-sm"
+              target="_blank"
+              rel="noopener"
+            >
+              <i class="bx bxl-github"></i> Repository GitHub
+            </a>
+          </div>
+        </div>
+
+        <!-- Project Info (below preview) -->
+        <div class="modal-preview-detail">
+          <div class="modal-header">
+            <i class="bx bx-folder modal-icon"></i>
+            <div>
+              <span class="project-type"
+                >Frontend Web / Personal Portfolio</span
+              >
+              <h3 id="modal-5-title">Web Portofolio</h3>
+            </div>
+          </div>
+          <div class="modal-body">
+            <p class="modal-desc">
+              Web Portofolio adalah website pribadi yang dirancang sebagai media
+              personal branding untuk menampilkan profil, pengalaman kerja di
+              bidang IT Support, daftar keahlian, dan riwayat project. Website
+              ini mengusung tema minimalis-modern dengan animasi interaktif pada
+              background dan dukungan mode terang/gelap.
+            </p>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-target-lock"></i> Tujuan Project</h4>
+              <p>
+                Membuat media portofolio interaktif yang representatif, cepat
+                diakses, responsif di berbagai perangkat, serta menunjukkan
+                keahlian di bidang networking, programming dasar, dan tools yang
+                dikuasai secara profesional.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-list-check"></i> Fitur Utama</h4>
+              <ul>
+                <li>
+                  Desain modern, responsif, dan bersih untuk berbagai resolusi
+                  layar
+                </li>
+                <li>
+                  Background interaktif Interactive Dot Matrix Grid berbasis
+                  HTML5 Canvas
+                </li>
+                <li>
+                  Sistem tema gelap (Dark Mode) dan terang (Light Mode) yang
+                  terintegrasi dengan localStorage
+                </li>
+                <li>Typing effect interaktif pada bagian role/pekerjaan</li>
+                <li>Navigasi menu smooth scroll dengan Scroll Spy aktif</li>
+                <li>Project card interaktif dengan modal popup detail</li>
+                <li>
+                  Form kontak dengan sistem validasi real-time dan notifikasi
+                  Toast
+                </li>
+              </ul>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-code-alt"></i> Teknologi</h4>
+              <div class="project-tech">
+                <span><i class="bx bxl-html5"></i> HTML</span>
+                <span><i class="bx bxl-css3"></i> CSS</span>
+                <span><i class="bx bxl-javascript"></i> JavaScript</span>
+                <span><i class="bx bx-font"></i> Google Fonts</span>
+                <span><i class="bx bx-box"></i> Boxicons</span>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4><i class="bx bx-check-circle"></i> Status</h4>
+              <span class="status-badge published"
+                ><i class="bx bx-check-double"></i> Selesai &mdash; Live</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/script.js"></script>
+  </body>
 </html>

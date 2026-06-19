@@ -1051,6 +1051,7 @@ body.static-bg::before {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top;
   display: block;
   transition: transform 0.4s ease;
 }
@@ -1246,6 +1247,10 @@ body.static-bg::before {
   border-left: 4px solid #ef4444;
 }
 
+.toast--info {
+  border-left: 4px solid var(--accent);
+}
+
 .toast-icon {
   font-size: 1.25rem;
   flex-shrink: 0;
@@ -1257,6 +1262,10 @@ body.static-bg::before {
 
 .toast--error .toast-icon {
   color: #ef4444;
+}
+
+.toast--info .toast-icon {
+  color: var(--accent);
 }
 
 /* Lightbox Fullscreen Preview */
@@ -1590,6 +1599,17 @@ body.static-bg::before {
 
 .modal-overlay.active .modal {
   transform: translateY(0) scale(1);
+}
+
+.modal:focus {
+  outline: none;
+}
+
+.modal:focus-visible,
+.modal button:focus-visible,
+.modal a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 /* Custom scrollbar for modal */
@@ -2169,6 +2189,17 @@ body.static-bg::before {
 
 .preview-wrap--image {
   height: auto !important;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.preview-wrap--image > img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .preview-iframe {
